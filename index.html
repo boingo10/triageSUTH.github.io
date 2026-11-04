@@ -1,16 +1,12 @@
-<!DOCTYPE html>
-<html lang="th"><head>
-<base target="_top">
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>คัดกรองฉุกเฉิน มทส.</title>
+<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600&family=Prompt:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 /* Layout: one-column wizard (group > ESI 1 > chief complaint > vitals > resources > result), big tap targets, sticky action bar at the bottom, stats on a second tab. */
 :root{
-  color-scheme:light;
   --bg:#FBF7F3; --surface:#FFFFFF; --ink:#2A2420; --muted:#6B6058; --line:#E7DCD2;
   --brand:#C74B08; --brand-ink:#FFFFFF; --brand-soft:#FDEBDD;
   --charcoal:#33291F; --charcoal-ink:#FBF4EC;
@@ -44,8 +40,6 @@
   color-scheme: dark;
 }
 *{box-sizing:border-box}
-[hidden]{display:none!important}
-body{margin:0}
 html{height:100%}
 body{min-height:100%; display:flex; flex-direction:column}
 body{
@@ -188,8 +182,7 @@ summary{cursor:pointer; font-weight:600; padding:8px 0}
 .empty{padding:22px; text-align:center; color:var(--muted); border:2px dashed var(--line); border-radius:14px}
 @media (prefers-reduced-motion: no-preference){ .opt,.btn{transition:background-color .12s, border-color .12s} }
 </style>
-</head>
-<body>
+
 <header class="top">
     <div class="in">
       <div>
@@ -459,8 +452,7 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function newState(){ return {group:null,ageBand:null,ageYears:null,ctx:{},l1:[],cat:null,cc:null,flags:[],gen:[],pain:null,painType:null,vit:{},vitL:{},res:[],resSeen:false,trauma24:false,override:null,startedAt:Date.now()}; }
 let S=newState(), view='triage', step=0, showResult=false, saveMsg=null;
-const GS=(window.google&&google.script&&google.script.run)?google.script.run:null;
-let dbh=!!GS, canWrite=GS?true:null, cases=[], dbState=GS?'ready':'none', range='7', sheetUrl=null, saving=false;
+let dbh=null, canWrite=null, cases=[], dbState='connecting', range='7';
 const STEPS=['กลุ่มผู้ป่วย','ESI 1','อาการสำคัญ','สัญญาณชีพ','ทรัพยากร'];
 
 const tog=(arr,id)=>{ const i=arr.indexOf(id); if(i>=0) arr.splice(i,1); else arr.push(id); };
@@ -481,7 +473,6 @@ function render(){
   if(view==='stats'){ bw.hidden=true; m.innerHTML=statsHTML(); return; }
   const R=computeTriage(S);
   let html='<p class="privacy">ระบบนี้ไม่เก็บชื่อ HN เลขบัตร หรือข้อมูลที่ระบุตัวบุคคลได้ เก็บเฉพาะข้อมูลคัดกรองแบบไม่ระบุตัวตนเพื่อทำสถิติ</p>';
-  if(!showResult && saveMsg && saveMsg.ok) html+=`<p class="status ok" role="status">${esc(saveMsg.t)}</p>`;
   if(showResult){ html+=resultHTML(R); m.innerHTML=html; renderBar(R); return; }
   html+='<ol class="steps">'+STEPS.map((t,i)=>{
     const cls=(i===step?' on':'')+(i<step?' done':'');
@@ -495,7 +486,7 @@ function render(){
 function renderBar(R){
   const bw=$('#barwrap'); bw.hidden=false; const bar=$('#bar');
   if(showResult){
-    bar.innerHTML=`<button class="btn" data-a="back">แก้ไขข้อมูล</button><div class="pillbox" id="livepill"></div><button class="btn primary" data-a="save"${canWrite===false||!dbh||saving?' disabled':''}>บันทึกและเคสใหม่</button>`;
+    bar.innerHTML=`<button class="btn" data-a="back">แก้ไขข้อมูล</button><div class="pillbox" id="livepill"></div><button class="btn primary" data-a="save"${canWrite===false||!dbh?' disabled':''}>บันทึกและเคสใหม่</button>`;
     const p=$('#livepill'); const f=finalLevel(R); p.innerHTML='<span class="pilllbl">ผลสุดท้าย</span><span class="pill l'+f+'"><b>ESI '+f+'</b></span>'; return;
   }
   const canNext = step===0 ? !!S.ageBand : step===2 ? (R.stage==='L1' || (!!S.cat && !!S.cc)) : true;
@@ -654,30 +645,37 @@ function buildRecord(){
     durationSec:Math.round((Date.now()-S.startedAt)/1000)
   };
 }
-function saveCase(){
-  if(saving) return;
-  if(!GS){ saveMsg={ok:false,t:'บันทึกไม่ได้ในมุมมองนี้'}; render(); return; }
-  saving=true; const rec=buildRecord();
-  GS.withSuccessHandler(function(){
-    saving=false; S=newState(); step=0; showResult=false; saveMsg={ok:true,t:'บันทึกเคสแล้ว เริ่มเคสใหม่ได้เลย'}; render(); window.scrollTo(0,0);
-  }).withFailureHandler(function(){
-    saving=false; saveMsg={ok:false,t:'บันทึกไม่สำเร็จ ลองอีกครั้ง'}; render();
-  }).saveCase(rec);
-}
-function loadCases(){
-  if(!GS){ dbState='none'; render(); return; }
-  dbState='connecting'; if(view==='stats') render();
-  const timer=setTimeout(function(){ if(dbState==='connecting'){ dbState='slow'; if(view==='stats') render(); } },20000);
-  GS.withSuccessHandler(function(rows){ clearTimeout(timer); cases=rows||[]; dbState='ready'; if(view==='stats') render(); })
-    .withFailureHandler(function(){ clearTimeout(timer); dbState='slow'; if(view==='stats') render(); }).getCases();
+async function saveCase(){
+  if(!dbh||canWrite===false){ saveMsg={ok:false,t:'บันทึกไม่ได้ในบัญชีนี้'}; render(); return; }
+  try{
+    await dbh.collection('cases').add(buildRecord());
+    S=newState(); step=0; showResult=false; saveMsg={ok:true,t:'บันทึกเคสแล้ว เริ่มเคสใหม่ได้เลย'};
+    render(); window.scrollTo(0,0);
+  }catch(e){
+    saveMsg={ok:false,t:'บันทึกไม่สำเร็จ ('+(e&&e.code?e.code:'error')+') ลองอีกครั้ง'}; render();
+  }
 }
 function inRange(c){
   if(range==='all') return true;
   const days=range==='1'?1:7; return c.tsMs >= Date.now()-days*86400000;
 }
+function csvCell(x){ const s=x===null||x===undefined?'':String(x); return '"'+s.replace(/"/g,'""')+'"'; }
+async function exportCsv(){
+  const rows=cases.filter(inRange);
+  const head=['time','group','age_band','age_years','category','chief_complaint','esi1_items','red_flags','general_flags','pain','pain_type','hr','rr','spo2','sbp','dbp','temp','gcs','dtx','resources','resource_count','trauma_24h','computed_level','final_level','overridden','override_reason','destination','duration_sec'];
+  const lines=[head.join(',')];
+  rows.forEach(c=>{ const v=c.vit||{};
+    lines.push([c.ts,c.group,c.ageBand,c.ageYears,c.cat,c.cc,(c.l1||[]).join('|'),(c.flags||[]).join('|'),(c.gen||[]).join('|'),c.pain,c.painType,v.hr,v.rr,v.spo2,v.sbp,v.dbp,v.temp,v.gcs,v.dtx,(c.res||[]).join('|'),c.resCount,c.trauma24,c.computedLevel,c.finalLevel,c.overridden,c.overrideReason,c.dest,c.durationSec].map(csvCell).join(','));
+  });
+  try{
+    const dl=await window.claude.use('downloads'); if(!dl) throw new Error('none');
+    await dl.save({filename:'triage-suth-'+new Date().toISOString().slice(0,10)+'.csv', data:'﻿'+lines.join('\n')});
+  }catch(e){ if(!(e&&e.code==='declined')){ const m=$('#expmsg'); if(m) m.textContent='ส่งออกไม่ได้ในมุมมองนี้'; } }
+}
+
 function statsHTML(){
   const rows=cases.filter(inRange); const n=rows.length;
-  let h='<section class="card"><h2>สถิติการคัดกรอง</h2><p class="sub">ข้อมูลไม่ระบุตัวตนของเคสที่บันทึกไว้</p><div class="grid chips" style="max-width:620px">'+[['1','วันนี้ (24 ชม.)'],['7','7 วัน'],['all','ทั้งหมด']].map(x=>chip('range',x[0],x[1],range===x[0])).join('')+chip('refresh','x','รีเฟรช',false)+'</div>';
+  let h='<section class="card"><h2>สถิติการคัดกรอง</h2><p class="sub">ข้อมูลไม่ระบุตัวตนของเคสที่บันทึกไว้</p><div class="grid chips" style="max-width:520px">'+[['1','วันนี้ (24 ชม.)'],['7','7 วัน'],['all','ทั้งหมด']].map(x=>chip('range',x[0],x[1],range===x[0])).join('')+'</div>';
   if(dbState==='connecting') h+='<p class="foot">กำลังโหลดข้อมูล…</p>';
   if(dbState==='slow') h+='<div class="note">ยังเชื่อมต่อฐานข้อมูลไม่ได้ ข้อมูลที่เห็นอาจไม่เป็นปัจจุบัน</div>';
   if(dbState==='none') h+='<div class="note">มุมมองนี้ไม่มีฐานข้อมูล จึงดูสถิติไม่ได้</div>';
@@ -700,7 +698,7 @@ function statsHTML(){
    +rows.slice(0,12).map(c=>{ const d=new Date(c.tsMs); const t=d.toLocaleString('th-TH',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}); const b=AGE_BANDS[c.ageBand];
      return `<tr><td>${esc(t)}</td><td>${esc(b?b.t:c.group)}</td><td>${esc(c.cc||'')}</td><td><span class="lvtag l${c.finalLevel}">${c.finalLevel}</span></td><td>${esc(c.dest||'')}</td></tr>`; }).join('')
    +'</tbody></table></div>';
-  h+='<p class="foot" style="margin-top:14px">ข้อมูลทั้งหมดอยู่ใน Google Sheet'+(sheetUrl?' · <a href="'+esc(sheetUrl)+'" target="_blank" rel="noopener">เปิดชีต</a>':'')+' ดาวน์โหลดเป็น Excel หรือ CSV ได้จากเมนู ไฟล์ ในชีต</p></section>';
+  h+='<div style="margin-top:14px" id="exprow"><button class="btn" data-a="export">ส่งออก CSV</button> <span class="foot" id="expmsg"></span></div></section>';
   return h;
 }
 
@@ -732,11 +730,10 @@ function clampStep(){ if(!S.ageBand) step=0; }
 document.addEventListener('click',e=>{
   const el=e.target.closest('[data-a]'); if(!el||el.disabled) return;
   const a=el.dataset.a, id=el.dataset.id;
-  if(['group','band','next','goto'].includes(a)) saveMsg=null;
   switch(a){
-    case 'tab': view=id; render(); if(view==='stats'){ window.scrollTo(0,0); loadCases(); } return;
+    case 'tab': view=id; render(); if(view==='stats') window.scrollTo(0,0); return;
     case 'range': range=id; render(); return;
-    case 'refresh': loadCases(); return;
+    case 'export': exportCsv(); return;
     case 'group': if(S.group!==id){ S.vit={}; S.vitL={}; S.group=id; S.ageBand=null; S.ageYears=null; S.ctx={}; S.l1=S.l1.filter(x=>{const it=L1.find(y=>y[0]===x); return !(it&&it[2]==='child'&&id!=='child');}); S.flags=[]; S.cc=null; S.cat=null; } break;
     case 'band': S.vit={}; S.vitL={}; S.ageBand=id; { const b=AGE_BANDS[id]; S.ageYears=b.g==='child'?b.yrs[0]:null; } break;
     case 'year': S.ageYears=parseInt(id,10); delete S.vit.sbp; delete S.vitL.sbp; break;
@@ -774,9 +771,23 @@ function bindView(){ const h=(location.hash||'').replace('#',''); view = h==='st
 window.addEventListener('hashchange',()=>{ bindView(); render(); });
 bindView(); render();
 
-if(GS){
-  GS.withSuccessHandler(function(u){ sheetUrl=u; if(view==='stats') render(); }).getSheetUrl();
-}
+(async function connect(){
+  try{
+    if(!(window.claude&&window.claude.use)){ dbState='none'; render(); return; }
+    const db=await window.claude.use('db');
+    if(!db){ dbState='none'; render(); return; }
+    dbh=db;
+    try{ const user=await window.claude.use('user'); if(user&&user.can){ const w=user.can('data.write'); canWrite=(w===null||w===undefined)?null:!!w; } }catch(_){}
+    const timer=setTimeout(()=>{ if(dbState==='connecting'){ dbState='slow'; if(view==='stats') render(); } },10000);
+    db.collection('cases').orderBy('tsMs','desc').limit(1000).onSnapshot(snap=>{
+      clearTimeout(timer);
+      cases=snap.docs.map(d=>d.data()).filter(Boolean);
+      if(!snap.metadata.fromCache||dbState==='connecting') dbState='ready';
+      if(view==='stats') render(); else if(showResult) renderBar(computeTriage(S));
+    },err=>{ clearTimeout(timer); dbState='slow'; if(view==='stats') render(); });
+    if(showResult) render();
+  }catch(_){ dbState='none'; render(); }
+})();
 </script>
-</body>
-</html>
+
+</body></html>

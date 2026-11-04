@@ -1,2 +1,795 @@
-# triageSUTH.github.io
-triage webapp 
+
+[คัดกรองฉุกเฉิน มทส v2.html](https://github.com/user-attachments/files/34380253/v2.html)
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>คัดกรองฉุกเฉิน มทส.</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600&family=Prompt:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: one-column wizard (group > ESI 1 > chief complaint > vitals > resources > result), big tap targets, sticky action bar at the bottom, stats on a second tab. */
+:root{
+  --bg:#FBF7F3; --surface:#FFFFFF; --ink:#2A2420; --muted:#6B6058; --line:#E7DCD2;
+  --brand:#C74B08; --brand-ink:#FFFFFF; --brand-soft:#FDEBDD;
+  --charcoal:#33291F; --charcoal-ink:#FBF4EC;
+  --focus:#1D5FD1;
+  --l1:#D3241B; --l1-ink:#FFFFFF; --l2:#C8336A; --l2-ink:#FFFFFF; --l3:#F4C31C; --l3-ink:#2A2420;
+  --l4:#3F8A22; --l4-ink:#FFFFFF; --l5:#D5DDE3; --l5-ink:#2A2420;
+  --warn-bg:#FFF4CE; --warn-ink:#5B4300; --warn-line:#E8C65A;
+  --danger-soft:#FBE3E1; --danger-ink:#8E1710;
+  --ok-soft:#E3F2DA; --ok-ink:#25570F;
+  --font-body:'IBM Plex Sans Thai','Noto Sans Thai',system-ui,sans-serif;
+  --font-display:'Prompt','IBM Plex Sans Thai',system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#181310; --surface:#231C17; --ink:#F4EBE3; --muted:#B5A89D; --line:#3C322B;
+    --brand:#FF8A3D; --brand-ink:#1B1410; --brand-soft:#3A2416;
+    --charcoal:#0F0B09; --charcoal-ink:#F4EBE3; --focus:#7FB0FF;
+    --l5:#3B4650; --l5-ink:#E9EEF2;
+    --warn-bg:#3A3010; --warn-ink:#F6E3A0; --warn-line:#7A6420;
+    --danger-soft:#43211F; --danger-ink:#FFC2BD; --ok-soft:#1F3517; --ok-ink:#BFE5A9;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#181310; --surface:#231C17; --ink:#F4EBE3; --muted:#B5A89D; --line:#3C322B;
+  --brand:#FF8A3D; --brand-ink:#1B1410; --brand-soft:#3A2416;
+  --charcoal:#0F0B09; --charcoal-ink:#F4EBE3; --focus:#7FB0FF;
+  --l5:#3B4650; --l5-ink:#E9EEF2;
+  --warn-bg:#3A3010; --warn-ink:#F6E3A0; --warn-line:#7A6420;
+  --danger-soft:#43211F; --danger-ink:#FFC2BD; --ok-soft:#1F3517; --ok-ink:#BFE5A9;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+html{height:100%}
+body{min-height:100%; display:flex; flex-direction:column}
+body{
+  background:var(--bg); color:var(--ink); font-family:var(--font-body); font-size:16px; line-height:1.55;
+  padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px));
+  padding-block:0;
+}
+button{font-family:inherit; font-size:inherit; color:inherit; cursor:pointer}
+:focus-visible{outline:3px solid var(--focus); outline-offset:2px}
+.wrap{width:100%; max-width:940px; margin:0 auto; padding-bottom:24px; flex:1 0 auto}
+header.top{
+  margin-inline:calc(-1 * max(16px, env(safe-area-inset-left, 0px)));
+  padding:14px max(16px, env(safe-area-inset-right, 0px)) 14px max(16px, env(safe-area-inset-left, 0px));
+  background:var(--charcoal); color:var(--charcoal-ink); border-bottom:4px solid var(--brand);
+}
+header.top .in{max-width:940px; margin:0 auto; display:flex; flex-wrap:wrap; gap:8px 20px; align-items:flex-end; justify-content:space-between}
+.hosp{font-size:13px; letter-spacing:.02em; opacity:.85}
+h1{font-family:var(--font-display); font-weight:600; font-size:clamp(20px,4.6vw,28px); line-height:1.2; margin:2px 0 0; text-wrap:balance}
+.tabs{display:flex; gap:6px}
+.tab{border:0; background:transparent; color:var(--charcoal-ink); padding:10px 16px; border-radius:10px; font-weight:500; opacity:.8}
+.tab[aria-current="page"]{background:var(--brand); color:var(--brand-ink); opacity:1}
+.privacy{margin:14px 0 0; font-size:14px; color:var(--muted)}
+.steps{display:flex; flex-wrap:wrap; gap:6px; margin:16px 0 14px; padding:0; list-style:none}
+.stp{display:flex; align-items:center; gap:8px; border:1.5px solid var(--line); background:var(--surface); border-radius:999px; padding:6px 14px 6px 6px; font-size:14px; color:var(--muted)}
+.stp b{display:grid; place-items:center; width:26px; height:26px; border-radius:50%; background:var(--line); color:var(--ink); font-size:13px; font-variant-numeric:tabular-nums}
+.stp.on{border-color:var(--brand); color:var(--ink); font-weight:600}
+.stp.on b{background:var(--brand); color:var(--brand-ink)}
+.stp.done b{background:var(--ok-soft); color:var(--ok-ink)}
+.stp:disabled{opacity:.55; cursor:default}
+@media (max-width:620px){ .stp .lbl{display:none} .stp.on .lbl{display:inline} .stp{padding-right:10px} }
+.card{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:18px; margin:0 0 14px}
+.card h2{font-family:var(--font-display); font-weight:600; font-size:19px; margin:0 0 4px; text-wrap:balance}
+.card .sub{margin:0 0 14px; color:var(--muted); font-size:15px}
+h3.sec{font-family:var(--font-display); font-weight:600; font-size:16px; margin:18px 0 8px}
+.grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap:10px}
+.grid.two{grid-template-columns:repeat(auto-fit, minmax(min(100%, 280px), 1fr))}
+.grid.chips{grid-template-columns:repeat(auto-fill, minmax(min(100%, 150px), 1fr))}
+.opt{display:flex; align-items:center; gap:12px; text-align:left; min-height:58px; min-width:0; padding:10px 14px; background:var(--surface); border:2px solid var(--line); border-radius:14px; line-height:1.35}
+.opt:hover{border-color:var(--muted)}
+.opt .tick{flex:none; width:24px; height:24px; border-radius:50%; border:2px solid var(--muted); position:relative}
+.opt.on{border-color:var(--brand); background:var(--brand-soft)}
+.opt.on .tick{background:var(--brand); border-color:var(--brand)}
+.opt.on .tick::after{content:""; position:absolute; left:7px; top:3px; width:6px; height:11px; border:solid var(--brand-ink); border-width:0 3px 3px 0; transform:rotate(45deg)}
+.opt .otxt{min-width:0; overflow-wrap:anywhere}
+.opt small{color:var(--muted); font-size:13px; font-weight:400; font-family:var(--font-body)}
+.opt.sq .tick{border-radius:7px}
+.opt.big{min-height:84px; font-size:18px; font-weight:600; font-family:var(--font-display)}
+.opt.danger.on{border-color:var(--l1); background:var(--danger-soft)}
+.opt.danger.on .tick{background:var(--l1); border-color:var(--l1)}
+.opt.chip{min-height:48px; justify-content:center; text-align:center; padding:8px 10px}
+.opt.chip .tick{display:none}
+.opt.chip.on{background:var(--brand); color:var(--brand-ink); border-color:var(--brand)}
+.sev{margin:14px 0 0; padding:12px 14px; border-radius:12px; font-weight:600; display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center; justify-content:space-between}
+.sev.l1{background:var(--l1); color:var(--l1-ink)}
+.sev .go{border:2px solid currentColor; background:transparent; color:inherit; border-radius:10px; padding:8px 14px; font-weight:600}
+.vgrid{display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap:12px}
+.vsec{padding:12px 0; border-top:1px solid var(--line)}
+.vsec:first-of-type{border-top:0}
+.vhead{display:flex; flex-wrap:wrap; gap:2px 12px; align-items:baseline; justify-content:space-between; margin-bottom:8px}
+.vhead .vl{font-weight:600; font-size:16px}
+.vhead small{color:var(--muted); font-weight:400; font-size:13.5px}
+.vchips{grid-template-columns:repeat(auto-fill,minmax(min(100%,104px),1fr))}
+.opt.chip.k1{border-color:var(--l1)} .opt.chip.k2{border-color:var(--l2)} .opt.chip.k3{border-color:var(--warn-line)}
+.opt.chip.on.k1{background:var(--l1); color:var(--l1-ink); border-color:var(--l1)}
+.opt.chip.on.k2{background:var(--l2); color:var(--l2-ink); border-color:var(--l2)}
+.opt.chip.on.k3{background:var(--warn-bg); color:var(--warn-ink); border-color:var(--warn-line)}
+.vsec .vs{margin-top:8px; font-size:14px; font-weight:600}
+.vsec .vs.s1{color:var(--danger-ink)} .vsec .vs.s2{color:var(--l2)} .vsec .vs.s3{color:var(--warn-ink)}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .vsec .vs.s2{color:#FF8FB6} }
+:root[data-theme="dark"] .vsec .vs.s2{color:#FF8FB6}
+.vf{display:grid; grid-template-columns:1fr auto; align-items:center; gap:2px 8px; padding:10px 12px; border:2px solid var(--line); border-radius:14px; background:var(--surface); min-width:0}
+.vf .vl{grid-column:1 / -1; font-weight:600; font-size:15px}
+.vf input{width:100%; min-width:0; font-family:var(--font-display); font-size:28px; font-weight:600; border:0; background:transparent; color:var(--ink); padding:2px 0; font-variant-numeric:tabular-nums}
+.vf input:focus{outline:none}
+.vf:focus-within{border-color:var(--focus)}
+.vf .vu{font-size:13px; color:var(--muted); white-space:nowrap}
+.vf .thr{grid-column:1 / -1; font-size:12.5px; color:var(--muted)}
+.vf .vs{grid-column:1 / -1; font-size:13.5px; font-weight:600; min-height:0}
+.vf.l1{border-color:var(--l1); background:var(--danger-soft)} .vf.l1 .vs{color:var(--danger-ink)}
+.vf.l2{border-color:var(--l2)} .vf.l2 .vs{color:var(--l2)}
+.vf.warn{border-color:var(--warn-line); background:var(--warn-bg)} .vf.warn .vs{color:var(--warn-ink)}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .vf.l2 .vs{color:#FF8FB6} }
+:root[data-theme="dark"] .vf.l2 .vs{color:#FF8FB6}
+.note{padding:12px 14px; border-radius:12px; background:var(--warn-bg); color:var(--warn-ink); border:1px solid var(--warn-line); font-size:15px; margin:10px 0}
+.note.info{background:var(--brand-soft); color:var(--ink); border-color:var(--line)}
+.note .row{display:flex; flex-wrap:wrap; gap:8px 12px; align-items:center; justify-content:space-between}
+.mini{border:2px solid currentColor; background:transparent; border-radius:10px; padding:6px 12px; font-weight:600; color:inherit}
+.bar{
+  position:sticky; bottom:0; z-index:5;
+  margin-inline:calc(-1 * max(16px, env(safe-area-inset-left, 0px)));
+  padding:10px max(16px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  background:var(--surface); border-top:1px solid var(--line); box-shadow:0 -6px 18px rgba(0,0,0,.08);
+}
+.bar .in{max-width:940px; margin:0 auto; display:grid; grid-template-columns:auto 1fr auto; gap:10px; align-items:center}
+@media (max-width:620px){ .bar .in{grid-template-columns:1fr 1fr} .bar .pillbox{grid-column:1 / -1; order:-1} }
+.btn{min-height:52px; padding:0 22px; border-radius:14px; border:2px solid var(--line); background:var(--surface); font-weight:600}
+.btn.primary{background:var(--brand); border-color:var(--brand); color:var(--brand-ink)}
+.btn:disabled{opacity:.45; cursor:not-allowed}
+.pillbox{display:flex; align-items:center; justify-content:center; gap:10px; min-width:0; flex-wrap:wrap}
+.pill{display:inline-flex; align-items:center; gap:8px; padding:6px 14px; border-radius:999px; font-weight:600; font-size:15px; background:var(--line); color:var(--ink)}
+.pill b{font-family:var(--font-display); font-size:18px}
+.pill.l1{background:var(--l1); color:var(--l1-ink)} .pill.l2{background:var(--l2); color:var(--l2-ink)} .pill.l3{background:var(--l3); color:var(--l3-ink)} .pill.l4{background:var(--l4); color:var(--l4-ink)} .pill.l5{background:var(--l5); color:var(--l5-ink)}
+.pilllbl{font-size:13px; color:var(--muted)}
+.hero{border-radius:18px; padding:20px; margin:0 0 14px; display:grid; gap:6px}
+.hero.l1{background:var(--l1); color:var(--l1-ink)} .hero.l2{background:var(--l2); color:var(--l2-ink)} .hero.l3{background:var(--l3); color:var(--l3-ink)} .hero.l4{background:var(--l4); color:var(--l4-ink)} .hero.l5{background:var(--l5); color:var(--l5-ink)}
+.hero .lv{font-family:var(--font-display); font-weight:700; font-size:clamp(44px,12vw,72px); line-height:1}
+.hero .tt{font-family:var(--font-display); font-weight:600; font-size:clamp(20px,4.6vw,26px); text-wrap:balance}
+.hero .dest{display:inline-block; width:fit-content; margin-top:6px; padding:4px 14px; border-radius:999px; background:rgba(255,255,255,.22); border:2px solid currentColor; font-weight:600}
+ul.clean{margin:0; padding:0; list-style:none; display:grid; gap:8px}
+ul.clean li{display:flex; gap:10px; align-items:flex-start}
+ul.clean li::before{content:""; flex:none; width:8px; height:8px; margin-top:.6em; border-radius:2px; background:var(--brand)}
+ul.chk li::before{width:16px; height:16px; margin-top:.32em; border:2px solid var(--brand); background:transparent; border-radius:5px}
+.ovr{display:flex; flex-wrap:wrap; gap:8px}
+.lvbtn{min-width:64px; min-height:48px; padding:0 14px; border-radius:12px; border:2px solid var(--line); background:var(--surface); font-weight:700; font-family:var(--font-display)}
+.lvbtn.on{border-color:var(--ink); box-shadow:inset 0 0 0 2px var(--ink)}
+.lvbtn:disabled{opacity:.35; cursor:not-allowed}
+.status{margin:10px 0 0; font-weight:600}
+.status.ok{color:var(--ok-ink)} .status.err{color:var(--danger-ink)}
+/* stats */
+.kpis{display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%,150px),1fr)); gap:10px}
+.kpi{padding:12px 14px; border:1px solid var(--line); border-radius:14px; background:var(--surface)}
+.kpi b{display:block; font-family:var(--font-display); font-size:30px; line-height:1.1; font-variant-numeric:tabular-nums}
+.kpi span{font-size:13.5px; color:var(--muted)}
+.hb{display:grid; grid-template-columns:78px 1fr 92px; gap:10px; align-items:center; margin:8px 0; font-size:15px}
+.hb .tr{height:22px; background:var(--line); border-radius:6px; overflow:hidden}
+.hb .fl{height:100%; border-radius:6px; min-width:2px}
+.hb .nm{min-width:0; overflow-wrap:anywhere}
+.hb .vl{text-align:right; font-variant-numeric:tabular-nums; color:var(--muted)}
+.fl.l1{background:var(--l1)} .fl.l2{background:var(--l2)} .fl.l3{background:var(--l3)} .fl.l4{background:var(--l4)} .fl.l5{background:var(--l5)} .fl.br{background:var(--brand)}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse; width:100%; font-size:14.5px}
+th,td{text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); white-space:nowrap}
+th{color:var(--muted); font-weight:500}
+.lvtag{display:inline-block; min-width:30px; text-align:center; padding:1px 8px; border-radius:8px; font-weight:700; font-family:var(--font-display)}
+.lvtag.l1{background:var(--l1); color:var(--l1-ink)} .lvtag.l2{background:var(--l2); color:var(--l2-ink)} .lvtag.l3{background:var(--l3); color:var(--l3-ink)} .lvtag.l4{background:var(--l4); color:var(--l4-ink)} .lvtag.l5{background:var(--l5); color:var(--l5-ink)}
+details{margin:6px 0 0}
+summary{cursor:pointer; font-weight:600; padding:8px 0}
+.ref td, .ref th{white-space:normal}
+.foot{font-size:13.5px; color:var(--muted); margin:6px 0 0}
+.empty{padding:22px; text-align:center; color:var(--muted); border:2px dashed var(--line); border-radius:14px}
+@media (prefers-reduced-motion: no-preference){ .opt,.btn{transition:background-color .12s, border-color .12s} }
+</style>
+
+<header class="top">
+    <div class="in">
+      <div>
+        <div class="hosp">โรงพยาบาลมหาวิทยาลัยเทคโนโลยีสุรนารี · แผนกอุบัติเหตุและฉุกเฉิน</div>
+        <h1>คัดกรองผู้ป่วยฉุกเฉิน (ESI v5)</h1>
+      </div>
+      <nav class="tabs" aria-label="เมนู">
+        <button class="tab" id="tab-triage" data-a="tab" data-id="triage">คัดกรอง</button>
+        <button class="tab" id="tab-stats" data-a="tab" data-id="stats">สถิติ</button>
+      </nav>
+    </div>
+</header>
+<main class="wrap" id="main"></main>
+<div class="bar" id="barwrap" hidden><div class="in" id="bar"></div></div>
+
+<script>
+/*LOGIC_START*/
+const APP_VERSION = '1.0';
+const AGE_BANDS = {
+  a1:{g:'adult', t:'15–64 ปี'},
+  a2:{g:'adult', t:'65 ปีขึ้นไป'},
+  c0:{g:'child', t:'แรกเกิด–28 วัน', yrs:[0], hr:180, rr:50},
+  c1:{g:'child', t:'29 วัน–<3 เดือน', yrs:[0], hr:180, rr:50},
+  c2:{g:'child', t:'3 เดือน–<3 ปี', yrs:[0,1,2], hr:160, rr:40},
+  c3:{g:'child', t:'3–<8 ปี', yrs:[3,4,5,6,7], hr:140, rr:30},
+  c4:{g:'child', t:'8–<15 ปี', yrs:[8,9,10,11,12,13,14], hr:120, rr:26}
+};
+const LEVELS = {
+  1:{title:'ต้องช่วยเหลือทันที'},
+  2:{title:'ต้องช่วยเหลืออย่างรวดเร็ว'},
+  3:{title:'ใช้ทรัพยากรตั้งแต่ 2 อย่าง หรือบาดเจ็บใน 24 ชม.'},
+  4:{title:'ใช้ทรัพยากร 1 อย่าง'},
+  5:{title:'ไม่ใช้ทรัพยากร'}
+};
+const CTX_ADULT = [['preg','ตั้งครรภ์ / หลังคลอด'],['immuno','ภูมิคุ้มกันต่ำ (เคมีบำบัด ปลูกถ่ายอวัยวะ สเตียรอยด์)'],['betablock','ใช้ยาที่กดชีพจร (เช่น beta-blocker)'],['chronicLung','โรคปอดเรื้อรัง (SpO₂ ปกติต่ำกว่าคนทั่วไป)']];
+const CTX_CHILD = [['immuno','ภูมิคุ้มกันต่ำ'],['immunIncomplete','ได้รับวัคซีนไม่ครบ'],['chronicLung','โรคปอดเรื้อรัง']];
+const L1 = [
+  ['arrest','หัวใจหยุดเต้น / ไม่มีชีพจร / ไม่หายใจ'],
+  ['airway','ทางเดินหายใจอุดกั้น ต้องช่วยหายใจ หรือใส่ท่อช่วยหายใจ'],
+  ['resp','หายใจลำบากรุนแรง ริมฝีปากหรือผิวเขียว'],
+  ['unresp','ไม่ตอบสนอง หรือตอบสนองเฉพาะความเจ็บ (P / U ตาม AVPU)'],
+  ['seizing','กำลังชักอยู่'],
+  ['shock','ช็อก ผิวซีดเย็น ชีพจรเบา ความดันต่ำ'],
+  ['anaph','แพ้รุนแรง (anaphylaxis)'],
+  ['hypo','น้ำตาลในเลือดต่ำรุนแรง ร่วมกับซึมหรือชัก'],
+  ['acs','เจ็บหน้าอกสงสัยกล้ามเนื้อหัวใจขาดเลือดเฉียบพลัน'],
+  ['stroke','แขนขาอ่อนแรง หน้าเบี้ยว พูดไม่ชัด เริ่มภายใน 4.5 ชั่วโมง'],
+  ['arrhy','หัวใจเต้นช้าหรือเร็วมาก ร่วมกับอาการไม่คงที่'],
+  ['pen','บาดแผลทะลุ ศีรษะ คอ อก ท้อง ที่ต้องช่วยชีวิตทันที'],
+  ['bleed','เลือดออกภายนอกมาก ต้องห้ามเลือดทันที'],
+  ['floppy','ทารกหรือเด็กปวกเปียก ไม่เคลื่อนไหว','child']
+];
+const L1_ACTION = {
+  arrest:'เริ่ม CPR และเตรียมเครื่องกระตุกหัวใจไฟฟ้า ตามแนวทาง ACLS / PALS',
+  airway:'เตรียมอุปกรณ์ทางเดินหายใจ ช่วยหายใจหรือใส่ท่อช่วยหายใจโดยแพทย์',
+  resp:'ให้ออกซิเจนความเข้มข้นสูง ประเมินทางเดินหายใจ และเตรียมช่วยหายใจ',
+  unresp:'ประเมิน ABC ตรวจน้ำตาลปลายนิ้ว (DTX) และหาสาเหตุที่แก้ไขได้ทันที',
+  seizing:'ป้องกันการบาดเจ็บ จัดท่า ตรวจ DTX และเตรียมยากันชักตามโปรโตคอล',
+  shock:'เปิดหลอดเลือดดำ 2 เส้น ให้สารน้ำหรือเลือดตามแนวทาง และหาสาเหตุ (เสียเลือด ติดเชื้อ หัวใจ)',
+  anaph:'ฉีด epinephrine เข้ากล้ามทันทีตามโปรโตคอลของโรงพยาบาล',
+  hypo:'ตรวจ DTX ซ้ำ และให้ dextrose ตามโปรโตคอล',
+  acs:'ทำ ECG 12 lead ทันที (ภายใน 10 นาที) แจ้งแพทย์ และเข้าเส้นทาง ACS / STEMI ของโรงพยาบาล',
+  stroke:'เปิด Stroke Fast Track บันทึกเวลาเริ่มมีอาการ (last known well) ตรวจ DTX และประสานทำ CT สมอง',
+  arrhy:'ต่อเครื่องติดตามคลื่นไฟฟ้าหัวใจ ทำ ECG แจ้งแพทย์ และเตรียมยาหรือการช็อกไฟฟ้าตามแนวทาง',
+  pen:'ห้ามเลือด เตรียมทีมอุบัติเหตุ และแจ้งศัลยแพทย์ตามโปรโตคอล',
+  bleed:'กดห้ามเลือดโดยตรงหรือใช้ tourniquet ตามความเหมาะสม เปิดหลอดเลือดดำ และเตรียมเลือด',
+  floppy:'ประเมิน ABC ตรวจ DTX และแจ้งกุมารแพทย์ทันที'
+};
+const GEN = [
+  ['ams','สับสน ซึม หรือมึนงง เกิดขึ้นใหม่ (GCS ≤12)'],
+  ['voice','เด็กอายุ <3 ปี ไม่ตอบสนองต่อเสียงเรียก','u3'],
+  ['seiz24','มีอาการชักภายใน 24 ชั่วโมง'],
+  ['harm','เสี่ยงรุนแรง ทำร้ายตนเองหรือผู้อื่น (คิดฆ่าตัวตาย ก้าวร้าว)'],
+  ['distress','ทุกข์ใจรุนแรง (เช่น เพิ่งถูกล่วงละเมิด สูญเสียคนใกล้ชิด) หรืออาละวาด']
+];
+/* flag = [id, text, option]; option 'child' | 'adult' | 'adv' (advisory only, does not set ESI 2) */
+const CATS = [
+ {id:'resp', t:'หายใจ / ไอ', cc:['หอบเหนื่อย หายใจลำบาก','ไอ','หวัด น้ำมูก คัดจมูก','เจ็บคอ','หอบหืด / COPD กำเริบ'],
+  hint:'ให้ผู้ป่วยอยู่ในท่าที่สบาย วัด SpO₂ ซ้ำ เตรียมออกซิเจนหรือยาพ่นตามแพทย์สั่ง',
+  flags:[['resp_short','หายใจเร็ว พูดได้เพียง 2–3 คำ'],['resp_tripod','นั่งโน้มตัวไปข้างหน้า / ใช้กล้ามเนื้อช่วยหายใจ'],['resp_stridor','เสียง stridor หรือ wheeze ดัง'],['resp_secret','กลืนน้ำลายไม่ได้ น้ำลายไหล'],['resp_fb','สำลักสิ่งแปลกปลอม'],['resp_hemopt','ไอเป็นเลือดมาก'],['resp_trach','ผู้ป่วยท่อเจาะคอ (tracheostomy) มีปัญหา'],['resp_retract','ย่นซี่โครง ครางหายใจ (grunting) อกบุ๋ม','child']]},
+ {id:'chest', t:'เจ็บหน้าอก / ใจสั่น / วูบ', cc:['เจ็บหน้าอก','ใจสั่น','หน้ามืด วูบ','บวมสองขา','อ่อนเพลีย'],
+  hint:'ทำ ECG 12 lead ภายใน 10 นาที ติดตามชีพจรและความดัน',
+  flags:[['chest_acs','เจ็บหน้าอกอยู่ในขณะนี้ สงสัยหัวใจขาดเลือด (ยังไม่ถึงขั้นไม่คงที่)'],['chest_dissect','เจ็บร้าวไปหลัง แบบฉีกขาด'],['chest_syncope','เป็นลมหมดสติ / วูบ เกิดขึ้นใหม่'],['chest_palp','ใจสั่นร่วมกับเหนื่อย เจ็บหน้าอก หรือความดันต่ำ'],['chest_ecg','ECG ผิดปกติ'],['chest_atyp','อ่อนเพลีย คลื่นไส้ อาเจียน ในผู้มีปัจจัยเสี่ยงหัวใจ (โดยเฉพาะผู้หญิง) อาการไม่ typical','adult']]},
+ {id:'neuro', t:'ปวดศีรษะ / ระบบประสาท', cc:['ปวดศีรษะ','เวียนศีรษะ บ้านหมุน','ชา อ่อนแรง','ชัก (หยุดแล้ว)','เห็นภาพซ้อน'],
+  hint:'ตรวจ DTX บันทึกเวลาเริ่มมีอาการ ประเมินระบบประสาท และแจ้งแพทย์ทันที',
+  flags:[['neuro_thunder','ปวดศีรษะรุนแรงฉับพลัน (thunderclap)'],['neuro_mening','ปวดศีรษะร่วมกับคอแข็ง ไข้ อาเจียน หรือซึม'],['neuro_stroke','อาการสมองขาดเลือด (อ่อนแรง พูดไม่ชัด หน้าเบี้ยว) เริ่มเกิน 4.5 ชม. หรือไม่ทราบเวลา'],['neuro_postictal','หลังชัก ยังไม่ตื่นดี (post-ictal)'],['neuro_febrile','เด็กชักจากไข้และยังซึม ไม่ตื่นดี','child']]},
+ {id:'abd', t:'ปวดท้อง / ทางเดินอาหาร', cc:['ปวดท้อง','คลื่นไส้ อาเจียน','ท้องเสีย','ท้องผูก','ถ่ายดำ หรือถ่ายเป็นเลือด'],
+  hint:'พิจารณางดน้ำและอาหารจนกว่าแพทย์ประเมิน ซักประวัติการตั้งครรภ์ในผู้ที่มีมดลูก',
+  flags:[['abd_severe','ปวดท้องรุนแรง ปวดตลอดไม่ทุเลาแม้ได้ยา หรือปวดสูงสุดตั้งแต่เริ่ม'],['abd_preg','ปวดท้องร่วมกับตั้งครรภ์หรือเลือดออกทางช่องคลอด'],['abd_gib','อาเจียนเป็นเลือด ถ่ายดำ หรือถ่ายเป็นเลือดมาก'],['abd_sepsis','ปวดท้องร่วมกับสัญญาณติดเชื้อรุนแรง หรือผิวซีดเย็น'],['abd_rigid','ท้องแข็งเกร็ง สงสัยลำไส้อุดตัน'],['abd_trauma','ถูกกระแทกหรือแทงบริเวณท้อง'],['abd_elder','อายุ ≥65 ปี ปวดท้องเฉียบพลัน','adult'],['abd_dehyd','อาเจียนหรือท้องเสียมาก ซึม ปัสสาวะน้อย ขาดน้ำ','child'],['abd_batt','กลืนถ่านกระดุมหรือแม่เหล็ก','child']]},
+ {id:'fever', t:'ไข้ / สงสัยติดเชื้อ', cc:['ไข้','ไข้ร่วมกับไอ','ไข้ร่วมกับผื่น','ไข้ร่วมกับท้องเสีย','ติดเชื้อทางเดินปัสสาวะ'],
+  hint:'ประเมินสัญญาณ sepsis (ชีพจร หายใจ ความดัน ซึม) และพิจารณาแยกผู้ป่วยหากสงสัยโรคติดต่อ',
+  flags:[['fever_immuno','ภูมิคุ้มกันต่ำ (เคมีบำบัด ปลูกถ่าย) และมีไข้หรือสงสัยติดเชื้อ'],['fever_petechia','ไข้ร่วมกับผื่นจ้ำเลือด (petechiae)'],['fever_sepsis','สงสัยติดเชื้อในกระแสเลือด (sepsis)'],['fever_neck','ไข้ร่วมกับคอแข็ง'],['fever_uti','ปัสสาวะแสบขัดร่วมกับหนาวสั่น ปวดหลัง หรืออายุมาก (สงสัย urosepsis)'],['fever_nosource','ไม่พบแหล่งของไข้ชัดเจน','child adv']]},
+ {id:'trauma', t:'อุบัติเหตุ / บาดเจ็บ', cc:['อุบัติเหตุรถ','ตกหกล้ม','แผลฉีกขาด','ปวดแขนขา สงสัยกระดูกหัก','ถูกทำร้าย','ศีรษะถูกกระแทก'],
+  hint:'ประเมินกลไกการบาดเจ็บ ตรึงกระดูกสันหลังหรือแขนขาตามสงสัย และตรวจ neurovascular ซ้ำ',
+  flags:[['tr_fall','ตกจากที่สูง ≥6 เมตร (20 ฟุต)'],['tr_eject','ถูกเหวี่ยงออกนอกรถ หรือต้องใช้อุปกรณ์ตัดรถช่วยออก'],['tr_pen','แผลทะลุ ศีรษะ คอ อก ท้อง (ความดันยังคงที่)'],['tr_nv','แขนขาเลือดไปเลี้ยงหรือเส้นประสาทผิดปกติ สงสัย compartment syndrome หรือถูกตัดขาด'],['tr_pelvis','สงสัยกระดูกเชิงกราน ต้นขาหัก หรือข้อใหญ่เคลื่อน'],['tr_head','ศีรษะกระแทกร่วมกับซึม อาเจียน หรือกินยากันเลือดแข็ง'],['tr_elder','ผู้สูงอายุที่บาดเจ็บ (ความรุนแรงอาจมากกว่ากลไก)','adult'],['tr_sexual','ถูกล่วงละเมิดทางเพศ']]},
+ {id:'ob', t:'สูตินรีเวช / ตั้งครรภ์', cc:['ปวดท้องน้อย','เลือดออกทางช่องคลอด','ตั้งครรภ์ มีอาการผิดปกติ','เจ็บครรภ์ น้ำเดิน','หลังคลอด'],
+  hint:'แจ้งสูติแพทย์หรือทีมสูติ วัดความดันซ้ำ ประเมินปริมาณเลือดออก',
+  flags:[['ob_bleed','เลือดออกมากทางช่องคลอด (เปียกผ้าอนามัยเต็มใน 1 ชั่วโมง หรือก้อนเลือดขนาดมะนาว)'],['ob_pph','ตกเลือดหลังคลอด'],['ob_sx','ตั้งครรภ์ร่วมกับเจ็บหน้าอก หอบ ปวดท้อง หรือปวดศีรษะ'],['ob_torsion','ปวดท้องน้อยข้างเดียวรุนแรง (สงสัยรังไข่บิดหรือท้องนอกมดลูก)'],['ob_labor','เจ็บครรภ์คลอด หรือน้ำเดิน']]},
+ {id:'gu', t:'ทางเดินปัสสาวะ / อวัยวะเพศ', cc:['ปัสสาวะแสบขัด','ปัสสาวะไม่ออก','ปัสสาวะเป็นเลือด','ปวดบั้นเอว','ปวดอัณฑะ'],
+  hint:'แจ้งแพทย์ทันทีหากสงสัยถุงอัณฑะบิดขั้ว เพราะต้องผ่าตัดเร่งด่วน',
+  flags:[['gu_torsion','ปวดอัณฑะหรือถุงอัณฑะเฉียบพลัน (สงสัย testicular torsion)'],['gu_flank','ปวดบั้นเอวรุนแรง (renal colic)'],['gu_urosepsis','อาการทางเดินปัสสาวะร่วมกับไข้หนาวสั่น ปวดหลัง หรืออายุมาก']]},
+ {id:'psych', t:'จิตเวช / สารเสพติด / ยาเกินขนาด', cc:['วิตกกังวล','ซึมเศร้า','เมาสุรา','ใช้สารเสพติด','พฤติกรรมเปลี่ยนไป','กินยา สารพิษ'],
+  hint:'ดูแลความปลอดภัยของผู้ป่วยและผู้อื่น จัดสิ่งแวดล้อมให้ปลอดภัย เฝ้าระวังใกล้ชิดตามโปรโตคอลจิตเวช',
+  flags:[['psy_ingest','กินยา สารพิษ หรือสารเคมีเกินขนาด (ทราบหรือไม่ทราบชนิด)'],['psy_psychotic','อาการทางจิต หลงผิด ประสาทหลอน'],['psy_violence','ผู้ผ่านเหตุการณ์ความรุนแรงหรือถูกล่วงละเมิดทางเพศ'],['psy_panic','ตื่นตระหนก หรือสะเทือนใจรุนแรง']]},
+ {id:'eent', t:'ตา / หู คอ จมูก', cc:['ตาแดง','ปวดหู','เจ็บคอ','เลือดกำเดาไหล','ก้างติดคอ'],
+  hint:'เตรียมประเมินทางเดินหายใจหรือดวงตาตามอาการ และแจ้งแพทย์',
+  flags:[['eent_vision','ตามองไม่เห็นหรือเห็นภาพซ้อนเฉียบพลัน'],['eent_chem','สารเคมีเข้าตา หรือบาดเจ็บลูกตา'],['eent_airway','กลืนน้ำลายไม่ได้ หรือมีเสียง stridor'],['eent_epistaxis','เลือดกำเดาพุ่ง หรือกินยากันเลือดแข็ง'],['eent_fb','สิ่งแปลกปลอมในทางเดินหายใจ'],['eent_batt','กลืนถ่านกระดุม','child']]},
+ {id:'skin', t:'ผิวหนัง / สัตว์กัด / แผล', cc:['ผื่นคัน','แผลติดเชื้อ','สัตว์กัด','ฝี','แพ้ยา แพ้อาหาร'],
+  hint:'ประเมินอาการแพ้หรือการติดเชื้อรุนแรง และแจ้งแพทย์',
+  flags:[['skin_rash','ผื่นลุกลามเร็วร่วมกับไข้หรือซึม'],['skin_immuno','แผลติดเชื้อในผู้ภูมิคุ้มกันต่ำ'],['skin_snake','ถูกงูพิษกัด'],['skin_angio','ลมพิษร่วมกับบวมที่ใบหน้าหรือริมฝีปาก']]},
+ {id:'other', t:'อื่น ๆ', cc:['ขอยาต่อเนื่อง','ใบรับรองแพทย์','ปวดเมื่อยทั่วไป','ตรวจสุขภาพ','อื่น ๆ'],
+  hint:'',
+  flags:[['oth_needle','เข็มทิ่มบุคลากรสุขภาพ (ต้องรีบให้ยาป้องกันหลังสัมผัส)'],['oth_bleed','เลือดออกไม่หยุด หรือมีโรคเลือด / ยากันเลือดแข็ง']]}
+];
+const RES = [
+  ['lab','ตรวจเลือด / ปัสสาวะ','Lab ทุกชนิดนับเป็น 1 อย่าง'],
+  ['img','ECG / X-ray','ภาพรังสีทุกชนิดนับเป็น 1 อย่าง'],
+  ['ct','CT / MRI / อัลตราซาวนด์ / angiography',''],
+  ['ivf','ให้สารน้ำทางหลอดเลือด','เพื่อแก้ไขภาวะขาดน้ำ'],
+  ['ivmed','ยาฉีด หรือยาพ่น','ฉีดเข้าหลอดเลือด เข้ากล้าม หรือพ่นยา'],
+  ['consult','ปรึกษาแพทย์เฉพาะทาง',''],
+  ['proc1','หัตถการง่าย (นับ 1)','เย็บแผล ใส่สายสวนปัสสาวะ'],
+  ['proc2','หัตถการซับซ้อน (นับ 2)','เช่น procedural sedation']
+];
+const NOT_RES = 'ไม่นับเป็นทรัพยากร: ซักประวัติตรวจร่างกาย ยากิน การตรวจ point-of-care ล็อกหลอดเลือด ฉีดวัคซีนบาดทะยัก ใบสั่งยา ทำแผลง่าย เฝือก ผ้าคล้องแขน ไม้เท้า โทรปรึกษาแพทย์ประจำตัว';
+
+function num(x){ if(x===null||x===undefined||x==='') return null; const n=parseFloat(String(x).replace(',','.')); return isFinite(n)?n:null; }
+function flagOpt(f){ return (f[2]||'').split(' '); }
+function catById(id){ return CATS.find(c=>c.id===id); }
+function bandInfo(S){ return AGE_BANDS[S.ageBand] || null; }
+function childAge(S){ const b=bandInfo(S); if(!b||b.g!=='child') return null; return S.ageYears!==null&&S.ageYears!==undefined ? S.ageYears : b.yrs[0]; }
+
+/* status of each vital sign: lvl 1 = ESI 1 criterion, 2 = ESI 2 criterion, 3 = caution */
+function vitalStatus(S){
+  const out={}; const b=bandInfo(S); if(!b) return out;
+  const v=S.vit||{}, ctx=S.ctx||{}; const adult=b.g==='adult';
+  const set=(k,lvl,text)=>{ if(!out[k]||lvl<out[k].lvl) out[k]={lvl,text}; };
+  const hr=num(v.hr), rr=num(v.rr), sp=num(v.spo2), sbp=num(v.sbp), dbp=num(v.dbp), t=num(v.temp), g=num(v.gcs);
+  if(sp!==null){
+    if(sp<90){ if(ctx.chronicLung) set('spo2',2,'SpO₂ <90% ในโรคปอดเรื้อรัง เทียบกับค่าปกติของผู้ป่วย (พิจารณา ESI 1 หากหายใจลำบาก)'); else set('spo2',1,'SpO₂ <90% → ESI 1'); }
+    else if(sp<92) set('spo2',2,'SpO₂ <92% → ESI 2');
+  }
+  if(rr!==null){
+    if(adult){ if(rr>30||rr<10) set('rr',1,rr>30?'หายใจ >30 ครั้ง/นาที → ESI 1':'หายใจ <10 ครั้ง/นาที → ESI 1'); else if(rr>28) set('rr',2,'หายใจ >28 ครั้ง/นาที → ESI 2'); }
+    else if(rr>b.rr) set('rr',2,'หายใจเร็วเกินเกณฑ์อายุ (>'+b.rr+') → ESI 2');
+  }
+  if(hr!==null){
+    if(adult){ if(hr>130) set('hr',2,'ชีพจร >130 ครั้ง/นาที → ESI 2'); }
+    else if(hr>b.hr) set('hr',2,'ชีพจรเร็วเกินเกณฑ์อายุ (>'+b.hr+') → ESI 2');
+  }
+  if(sbp!==null){
+    if(adult){
+      if(sbp<90) set('sbp',1,'SBP <90 mmHg → ESI 1');
+      else if(sbp>=180) set('sbp',2,'SBP ≥180 mmHg → ESI 2');
+      else if(ctx.preg && sbp>150) set('sbp',2,'ตั้งครรภ์/หลังคลอด SBP >150 → ESI 2');
+    } else {
+      const thr=70+2*childAge(S);
+      if(sbp<thr) set('sbp',1,'SBP <'+thr+' mmHg (70+2×อายุ) → ESI 1');
+    }
+  }
+  if(adult && dbp!==null){
+    if(dbp>=110) set('dbp',2,'DBP ≥110 mmHg → ESI 2');
+    if(sbp!==null){ const map=(sbp+2*dbp)/3; if(map<65) set('dbp',1,'MAP <65 mmHg → ESI 1'); }
+  }
+  if(t!==null){
+    if(S.ageBand==='c0' && t>38) set('temp',2,'ทารก ≤28 วัน มีไข้ >38°C → ESI 2 ขึ้นไป');
+    else if(S.ageBand==='c1' && t>38) set('temp',3,'ทารก 29 วัน–3 เดือน มีไข้ >38°C พิจารณา ESI 2');
+    else if(!adult && (t>39||t<36)) set('temp',3,t<36?'อุณหภูมิ <36°C ในเด็ก ระวัง sepsis':'ไข้ >39°C ในเด็ก พิจารณา ESI 2–3');
+    else if(adult && t>=38 && ctx.immuno) set('temp',2,'ภูมิคุ้มกันต่ำ + ไข้ → ESI 2');
+  }
+  if(g!==null){
+    if(g<=8) set('gcs',1,'GCS ≤8 → ESI 1');
+    else if(g<=12 && !v.gcsBaseline) set('gcs',2,'GCS ≤12 (ใหม่) → ESI 2');
+  }
+  if(v.dtx==='low') set('dtx',2,'DTX <70 mg% → ESI 2');
+  if(v.dtx==='high') set('dtx',2,'DTX >350 mg% → ESI 2');
+  return out;
+}
+
+function resourceCount(S){
+  let n=0; (S.res||[]).forEach(id=>{ n += (id==='proc2')?2:1; }); return n;
+}
+function traumaEff(S){ return !!S.trauma24 || S.cat==='trauma'; }
+function uniq(a){ return a.filter((x,i)=>a.indexOf(x)===i); }
+
+function computeTriage(S){
+  const R={level:null, stage:null, l1:[], l2:[], adv:[], notes:[], resCount:0, dest:null};
+  const b=bandInfo(S); if(!b) return R;
+  const adult=b.g==='adult'; const vs=vitalStatus(S); const v=S.vit||{};
+  // A. lifesaving
+  (S.l1||[]).forEach(id=>{ const it=L1.find(x=>x[0]===id); if(it) R.l1.push(it[1]); });
+  Object.keys(vs).forEach(k=>{ if(vs[k].lvl===1) R.l1.push(vs[k].text.replace(/ → ESI 1$/,'')); });
+  R.l1=uniq(R.l1);
+  // B. high risk
+  const cat=catById(S.cat);
+  GEN.forEach(g=>{ if((S.gen||[]).includes(g[0])) R.l2.push(g[1]); });
+  if(cat) cat.flags.forEach(f=>{ const o=flagOpt(f); if((S.flags||[]).includes(f[0]) && !o.includes('adv')) R.l2.push(f[1]); });
+  const pain=S.pain;
+  if(pain!==null && pain!==undefined && pain>=7){
+    if(S.painType==='sys') R.l2.push('ปวดรุนแรง '+pain+'/10 จากโรคทางระบบ');
+    else if(S.painType==='msk') R.notes.push('ปวด '+pain+'/10 จากกระดูกหรือกล้ามเนื้อ: ให้ยาแก้ปวดตาม standing order ที่จุดคัดกรอง ประคบเย็น ยกสูง แล้วประเมินทรัพยากรต่อ ผู้ป่วยรอตรวจได้หากไม่มีปัญหาเลือดไปเลี้ยงหรือเส้นประสาท');
+  }
+  Object.keys(vs).forEach(k=>{ if(vs[k].lvl===2) R.l2.push(vs[k].text.replace(/ → ESI 2( ขึ้นไป)?$/,'')); });
+  R.l2=uniq(R.l2);
+  // C. resources
+  R.resCount=resourceCount(S);
+  let lvRes = R.resCount>=2?3 : (R.resCount===1?4:5);
+  if(traumaEff(S)){ lvRes=Math.min(lvRes,3); R.notes.push('บาดเจ็บภายใน 24 ชั่วโมง: จัดเป็น ESI 3 อย่างน้อย ตามเกณฑ์ของโรงพยาบาล'); }
+  if(R.l1.length){ R.level=1; R.stage='L1'; }
+  else if(R.l2.length){ R.level=2; R.stage='L2'; }
+  else { R.level=lvRes; R.stage='RES'; }
+  R.dest = R.level<=3 ? 'ER' : 'OPD';
+  // D. advisories
+  const hr=num(v.hr), rr=num(v.rr), sp=num(v.spo2), t=num(v.temp);
+  const A=(text,raiseTo)=>R.adv.push({text,raiseTo:raiseTo||null});
+  if(adult && hr!==null && (hr<40||hr>180) && R.level>1) A('ชีพจร '+hr+' ครั้ง/นาที ผิดปกติมาก ผู้ป่วยอาจไม่คงที่ พิจารณา ESI 1',1);
+  if(adult && R.level>=3 && ((hr!==null&&hr>100)||(rr!==null&&rr>20)||(sp!==null&&sp<92))) A('สัญญาณชีพเกินเกณฑ์ ESI (ชีพจร >100 หรือหายใจ >20) ให้วัดซ้ำ ถ้ายังผิดปกติพิจารณา ESI 2',2);
+  if(S.ageBand==='c0' && S.cat==='fever' && R.level>2) A('ทารก ≤28 วัน ที่มีไข้ ต้องจัดเป็น ESI 2 อย่างน้อย ตรวจวัดอุณหภูมิยืนยัน',2);
+  if(S.ageBand==='c1' && ((t!==null&&t>38)||S.cat==='fever') && R.level>2) A('ทารก 29 วัน–3 เดือน ที่มีไข้ พิจารณา ESI 2',2);
+  if(!adult && !['c0','c1'].includes(S.ageBand) && R.level>3){
+    const fever=(t!==null&&t>=38)||S.cat==='fever';
+    const nosrc=(S.flags||[]).includes('fever_nosource');
+    if(fever && ((t!==null&&(t>39||t<36)) || (S.ctx||{}).immunIncomplete || nosrc)) A('เด็กอายุ ≥3 เดือน มีไข้ร่วมกับ (T >39 หรือ <36°C / วัคซีนไม่ครบ / ไม่พบแหล่งไข้) พิจารณา ESI 2 หรือ 3',3);
+  }
+  if(R.level>=3 && !(hr!==null||rr!==null||sp!==null||num(v.sbp)!==null)) A('ยังไม่ได้ใส่สัญญาณชีพ ESI 3–5 ควรมีสัญญาณชีพครบก่อนสรุป',null);
+  if(S.ageBand==='a2') A('ผู้สูงอายุ: มีโอกาสถูกประเมินต่ำกว่าจริง (under-triage) และสัญญาณชีพอาจดู "ปกติ" ทั้งที่ป่วยหนัก',null);
+  if((S.ctx||{}).betablock) A('ใช้ยากดชีพจร: ชีพจรอาจไม่เร็วแม้มีภาวะช็อก ให้ประเมินร่วมกับอาการ',null);
+  return R;
+}
+
+function recommend(level,S,R){
+  const A=[]; const b=bandInfo(S); const child=b&&b.g==='child'; const cat=catById(S.cat);
+  if(level===1){
+    A.push('ย้ายเข้าห้องช่วยฟื้นคืนชีพทันที ไม่ต้องรอวัดสัญญาณชีพให้ครบ');
+    A.push('เรียกแพทย์ ทีมช่วยชีวิต และหัวหน้าเวรทันที');
+    A.push('ต่อเครื่องติดตามสัญญาณชีพ ให้ออกซิเจนและเปิดทางเดินหายใจตามความจำเป็น เปิดหลอดเลือดดำ');
+    (S.l1||[]).forEach(id=>{ if(L1_ACTION[id]) A.push(L1_ACTION[id]); });
+    if(child) A.push('ใช้ขนาดยาและอุปกรณ์ตามน้ำหนักหรือความยาวตัวของเด็ก (เทปวัดความยาว หรือตารางน้ำหนัก)');
+  } else if(level===2){
+    A.push('แจ้งหัวหน้าเวรและแพทย์ ER ทันที ไม่ให้ผู้ป่วยรออยู่ที่จุดคัดกรอง');
+    A.push('นำเข้าพื้นที่ตรวจที่ติดตามได้ใกล้ชิด ต่อเครื่องติดตามสัญญาณชีพ');
+    A.push('เปิดหลอดเลือดดำและส่งตรวจเบื้องต้นตามอาการ');
+    if(cat && cat.hint) A.push(cat.hint);
+    if(S.vit && S.vit.dtx==='low') A.push('DTX ต่ำ: ให้น้ำตาลตามโปรโตคอลและตรวจซ้ำ');
+    A.push('วัดสัญญาณชีพซ้ำบ่อย หากอาการแย่ลงให้ยกระดับเป็น ESI 1 ทันที');
+  } else if(level===3){
+    A.push('จัดคิวเข้าห้องตรวจ ER ตามลำดับความเร่งด่วน');
+    const need=(S.res||[]).map(id=>{const r=RES.find(x=>x[0]===id); return r?r[1]:null;}).filter(Boolean);
+    if(need.length) A.push('เตรียมการตรวจที่คาดว่าต้องใช้: '+need.join(', '));
+    A.push('วัดสัญญาณชีพซ้ำตามเวลาที่โรงพยาบาลกำหนดระหว่างรอ');
+    A.push('หากอาการหรือสัญญาณชีพแย่ลง ให้ยกระดับ บันทึกเวลาและเหตุผล');
+  } else if(level===4){
+    A.push('ส่งตรวจที่ OPD หรือพื้นที่ผู้ป่วยไม่เร่งด่วน');
+    A.push('คาดว่าใช้ทรัพยากร 1 อย่าง (เช่น lab หรือภาพรังสี หรือยาฉีด) แจ้งแพทย์เจ้าของไข้ล่วงหน้า');
+    A.push('แนะนำให้แจ้งเจ้าหน้าที่ทันทีหากอาการแย่ลงระหว่างรอ');
+  } else {
+    A.push('ส่งตรวจที่ OPD ตามคิว');
+    A.push('คาดว่าตรวจร่างกายและให้ยากินหรือใบสั่งยา ไม่ต้องใช้ทรัพยากรเพิ่ม');
+    A.push('แนะนำให้แจ้งเจ้าหน้าที่ทันทีหากอาการแย่ลงระหว่างรอ');
+  }
+  return A;
+}
+/*LOGIC_END*/
+
+/* ---------------- UI ---------------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function newState(){ return {group:null,ageBand:null,ageYears:null,ctx:{},l1:[],cat:null,cc:null,flags:[],gen:[],pain:null,painType:null,vit:{},vitL:{},res:[],resSeen:false,trauma24:false,override:null,startedAt:Date.now()}; }
+let S=newState(), view='triage', step=0, showResult=false, saveMsg=null;
+let dbh=null, canWrite=null, cases=[], dbState='connecting', range='7';
+const STEPS=['กลุ่มผู้ป่วย','ESI 1','อาการสำคัญ','สัญญาณชีพ','ทรัพยากร'];
+
+const tog=(arr,id)=>{ const i=arr.indexOf(id); if(i>=0) arr.splice(i,1); else arr.push(id); };
+const opt=(act,id,label,on,cls='')=>`<button type="button" class="opt ${cls}${on?' on':''}" data-a="${act}" data-id="${esc(id)}" aria-pressed="${on?'true':'false'}"><span class="tick" aria-hidden="true"></span><span class="otxt">${label}</span></button>`;
+const chip=(act,id,label,on)=>`<button type="button" class="opt chip${on?' on':''}" data-a="${act}" data-id="${esc(id)}" aria-pressed="${on?'true':'false'}"><span class="otxt">${label}</span></button>`;
+const finalLevel=R=>S.override?S.override.level:R.level;
+
+function pillHTML(R){
+  if(!R.level) return '<span class="pilllbl">เลือกกลุ่มผู้ป่วยก่อน</span>';
+  if(R.stage==='RES' && !S.resSeen) return '<span class="pilllbl">ระดับเบื้องต้น</span><span class="pill">ยังไม่เข้าเกณฑ์ ESI 1–2</span>';
+  return '<span class="pilllbl">ระดับเบื้องต้น</span><span class="pill l'+R.level+'"><b>ESI '+R.level+'</b></span>';
+}
+
+function render(){
+  $('#tab-triage').setAttribute('aria-current', view==='triage'?'page':'false');
+  $('#tab-stats').setAttribute('aria-current', view==='stats'?'page':'false');
+  const m=$('#main'), bw=$('#barwrap');
+  if(view==='stats'){ bw.hidden=true; m.innerHTML=statsHTML(); return; }
+  const R=computeTriage(S);
+  let html='<p class="privacy">ระบบนี้ไม่เก็บชื่อ HN เลขบัตร หรือข้อมูลที่ระบุตัวบุคคลได้ เก็บเฉพาะข้อมูลคัดกรองแบบไม่ระบุตัวตนเพื่อทำสถิติ</p>';
+  if(showResult){ html+=resultHTML(R); m.innerHTML=html; renderBar(R); return; }
+  html+='<ol class="steps">'+STEPS.map((t,i)=>{
+    const cls=(i===step?' on':'')+(i<step?' done':'');
+    const dis=(!S.ageBand&&i>0)?' disabled':'';
+    return `<li><button type="button" class="stp${cls}" data-a="goto" data-id="${i}"${dis}><b>${i+1}</b><span class="lbl">${t}</span></button></li>`;
+  }).join('')+'</ol>';
+  html+=[step0,step1,step2,step3,step4][step](R);
+  m.innerHTML=html; renderBar(R);
+}
+
+function renderBar(R){
+  const bw=$('#barwrap'); bw.hidden=false; const bar=$('#bar');
+  if(showResult){
+    bar.innerHTML=`<button class="btn" data-a="back">แก้ไขข้อมูล</button><div class="pillbox" id="livepill"></div><button class="btn primary" data-a="save"${canWrite===false||!dbh?' disabled':''}>บันทึกและเคสใหม่</button>`;
+    const p=$('#livepill'); const f=finalLevel(R); p.innerHTML='<span class="pilllbl">ผลสุดท้าย</span><span class="pill l'+f+'"><b>ESI '+f+'</b></span>'; return;
+  }
+  const canNext = step===0 ? !!S.ageBand : step===2 ? (R.stage==='L1' || (!!S.cat && !!S.cc)) : true;
+  const last = step===4;
+  bar.innerHTML=`<button class="btn" data-a="prev"${step===0?' disabled':''}>ย้อนกลับ</button><div class="pillbox" id="livepill">${pillHTML(R)}</div><button class="btn primary" data-a="next"${canNext?'':' disabled'}>${last?'ดูผลและคำแนะนำ':'ต่อไป'}</button>`;
+}
+
+function step0(R){
+  const g=S.group;
+  let h=`<section class="card"><h2>เลือกกลุ่มผู้ป่วย</h2><p class="sub">เลือกกลุ่มอายุเพื่อใช้เกณฑ์ที่เหมาะสม</p>
+  <div class="grid two">${opt('group','adult','ผู้ใหญ่ (อายุ ≥15 ปี)',g==='adult','big')}${opt('group','child','เด็ก (อายุ <15 ปี)',g==='child','big')}</div>`;
+  if(g){
+    const bands=Object.keys(AGE_BANDS).filter(k=>AGE_BANDS[k].g===g);
+    h+='<h3 class="sec">ช่วงอายุ</h3><div class="grid chips">'+bands.map(k=>chip('band',k,AGE_BANDS[k].t,S.ageBand===k)).join('')+'</div>';
+    const b=bandInfo(S);
+    if(b&&b.g==='child'&&b.yrs.length>1){
+      h+='<h3 class="sec">อายุ (ปีเต็ม) ใช้คำนวณเกณฑ์ความดันต่ำ</h3><div class="grid chips">'+b.yrs.map(y=>chip('year',y,y+' ปี',childAge(S)===y)).join('')+'</div>';
+      h+='<p class="foot">ความดัน SBP ต่ำกว่า 70 + (2 × อายุปี) = '+(70+2*childAge(S))+' mmHg ถือเป็น ESI 1</p>';
+    }
+    if(b){
+      h+='<h3 class="sec">ข้อมูลประกอบ (เลือกเฉพาะที่มี)</h3><div class="grid">'+(g==='adult'?CTX_ADULT:CTX_CHILD).map(c=>opt('ctx',c[0],c[1],!!S.ctx[c[0]],'sq')).join('')+'</div>';
+    }
+  }
+  return h+'</section>';
+}
+
+function step1(R){
+  const child=bandInfo(S).g==='child';
+  const items=L1.filter(x=>!(x[2]==='child'&&!child));
+  let h=`<section class="card"><h2>มีภาวะที่ต้องช่วยชีวิตทันทีหรือไม่ (ESI 1)</h2><p class="sub">เลือกทุกข้อที่พบ ถ้าไม่มีข้อใดเลย กด "ต่อไป"</p><div class="grid">${items.map(x=>opt('l1',x[0],x[1],S.l1.includes(x[0]),'danger sq')).join('')}</div>`;
+  if(R.stage==='L1'){
+    h+=`<div class="sev l1" role="alert"><span>ESI 1 ต้องช่วยเหลือทันที: ${esc(R.l1.slice(0,2).join(' · '))}</span><button class="go" data-a="result">ดูคำแนะนำทันที</button></div>`;
+  }
+  return h+'</section>';
+}
+
+function step2(R){
+  const child=bandInfo(S).g==='child';
+  let h='<section class="card"><h2>อาการสำคัญ (chief complaint)</h2><p class="sub">เลือกหมวดอาการหลัก แล้วเลือกอาการ</p>';
+  h+='<div class="grid">'+CATS.map(c=>opt('cat',c.id,c.t,S.cat===c.id)).join('')+'</div>';
+  const cat=catById(S.cat);
+  if(cat){
+    h+='<h3 class="sec">อาการที่มาโรงพยาบาล</h3><div class="grid chips">'+cat.cc.map((t,i)=>chip('cc',i,t,S.cc===t)).join('')+'</div>';
+    const fl=cat.flags.filter(f=>{const o=flagOpt(f); if(o.includes('child')&&!child) return false; if(o.includes('adult')&&child) return false; return true;});
+    if(fl.length){
+      h+='<h3 class="sec">สัญญาณอันตราย (ESI 2) เลือกที่พบ</h3><div class="grid">'+fl.map(f=>opt('flag',f[0],f[1],S.flags.includes(f[0]),'sq')).join('')+'</div>';
+    }
+  }
+  h+='<h3 class="sec">ประเมินทั่วไป</h3><div class="grid">'+GEN.filter(g=>!(g[2]==='u3'&&!['c0','c1','c2'].includes(S.ageBand))).map(g=>opt('gen',g[0],g[1],S.gen.includes(g[0]),'sq')).join('')+'</div>';
+  h+='<h3 class="sec">ระดับความปวด (0–10)</h3><div class="grid chips" style="grid-template-columns:repeat(auto-fill,minmax(64px,1fr))">'+[0,1,2,3,4,5,6,7,8,9,10].map(n=>chip('pain',n,n,S.pain===n)).join('')+'</div>';
+  if(S.pain!==null && S.pain>=7){
+    h+='<p class="foot" style="margin-top:10px">ปวดรุนแรงมีสาเหตุจากอะไร</p><div class="grid two">'+opt('ptype','sys','โรคทางระบบ หรือไม่ทราบสาเหตุ (เช่น นิ่วในไต มะเร็ง sickle cell ปวดท้อง ศีรษะ หน้าอก)',S.painType==='sys')+opt('ptype','msk','บาดเจ็บกระดูกหรือกล้ามเนื้อ ไม่มีปัญหาเลือดไปเลี้ยงหรือเส้นประสาท',S.painType==='msk')+'</div>';
+  }
+  if(R.stage==='L2') h+=`<div class="note info" role="status"><b>ESI 2</b> จาก: ${esc(R.l2.slice(0,3).join(' · '))}${R.l2.length>3?' และอื่น ๆ':''}</div>`;
+  if(R.stage==='L1') h+=`<div class="sev l1" role="alert"><span>ESI 1 จาก: ${esc(R.l1.slice(0,2).join(' · '))}</span><button class="go" data-a="result">ดูคำแนะนำทันที</button></div>`;
+  return h+'</section>';
+}
+
+function thrText(k){
+  const b=bandInfo(S); if(!b) return '';
+  const adult=b.g==='adult';
+  if(k==='hr') return adult?'ESI 2: >130':'ESI 2: >'+b.hr;
+  if(k==='rr') return adult?'ESI 1: >30 หรือ <10 · ESI 2: >28':'ESI 2: >'+b.rr;
+  if(k==='spo2') return 'ESI 1: <90 · ESI 2: <92';
+  if(k==='sbp') return adult?'ESI 1: <90 · ESI 2: ≥180':'ESI 1: <'+(70+2*childAge(S));
+  if(k==='dbp') return adult?'ESI 2: ≥110 · MAP <65 = ESI 1':'ไม่จำเป็นในเด็ก';
+  if(k==='temp') return adult?'ภูมิคุ้มกันต่ำ + ≥38 = ESI 2':'ตามกฎไข้ในเด็ก';
+  return '';
+}
+const VFIELDS=[['hr','ชีพจร','ครั้ง/นาที'],['rr','อัตราการหายใจ','ครั้ง/นาที'],['spo2','SpO₂','%'],['sbp','ความดัน SBP','mmHg'],['dbp','ความดัน DBP','mmHg'],['temp','อุณหภูมิ','°C']];
+
+function vBins(k){
+  const b=bandInfo(S); const adult=b.g==='adult'; const B=(l,v)=>({l:String(l),v:String(v)});
+  if(k==='hr') return adult?[B('<40',35),B('40–59',50),B('60–100',80),B('101–130',115),B('131–180',150),B('>180',190)]:[B('≤'+b.hr,b.hr-20),B('>'+b.hr,b.hr+10)];
+  if(k==='rr') return adult?[B('<10',8),B('10–20',16),B('21–28',24),B('29–30',30),B('>30',35)]:[B('≤'+b.rr,b.rr-6),B('>'+b.rr,b.rr+6)];
+  if(k==='spo2') return [B('<90',85),B('90–91',91),B('92–94',93),B('≥95',98)];
+  if(k==='sbp'){ if(adult) return [B('<90',80),B('90–99',95),B('100–139',120),B('140–150',145),B('151–179',160),B('≥180',190)]; const t=70+2*childAge(S); return [B('<'+t,t-10),B('≥'+t,t+20)]; }
+  if(k==='dbp') return [B('<60',50),B('60–89',75),B('90–109',100),B('≥110',115)];
+  if(k==='temp') return [B('<36',35.5),B('36–37.9',37),B('38–38.9',38.5),B('39–39.9',39.5),B('≥40',40.5)];
+  return [];
+}
+function step3(R){
+  const b=bandInfo(S); const adult=b.g==='adult'; const vs=vitalStatus(S);
+  let h='<section class="card"><h2>สัญญาณชีพ</h2><p class="sub">แตะช่วงค่าที่วัดได้ แตะซ้ำเพื่อยกเลิก ข้ามช่องที่ไม่ได้วัดได้ ปุ่มขอบสีคือช่วงที่เข้าเกณฑ์อันตราย ESI 3–5 ควรมีสัญญาณชีพครบ</p>';
+  VFIELDS.forEach(f=>{
+    const k=f[0]; if(k==='dbp'&&!adult) return;
+    const cur=S.vit[k];
+    h+=`<div class="vsec"><div class="vhead"><span class="vl">${f[1]} <small>${f[2]}</small></span><small class="thrline">${thrText(k)}</small></div><div class="grid chips vchips">`
+     +vBins(k).map((x,i)=>{
+        const st=vitalStatus(Object.assign({},S,{vit:Object.assign({},S.vit,{[k]:x.v})}))[k]; const kc=st?' k'+st.lvl:'';
+        const on=cur===x.v;
+        return `<button type="button" class="opt chip${on?' on':''}${kc}" data-a="vit" data-id="${k}:${i}" aria-pressed="${on}"><span class="otxt">${esc(x.l)}</span></button>`;
+      }).join('')+'</div>';
+    const st=vs[k]; h+=`<div class="vs${st?' s'+st.lvl:''}" id="vs-${k}">${st?esc(st.text):''}</div></div>`;
+  });
+  h+='<div class="vsec"><div class="vhead"><span class="vl">ระดับความรู้สึกตัว <small>GCS</small></span><small class="thrline">ESI 1: ≤8 · ESI 2: ≤12 (ใหม่)</small></div><div class="grid chips" style="grid-template-columns:repeat(auto-fill,minmax(56px,1fr))">'+[3,4,5,6,7,8,9,10,11,12,13,14,15].map(n=>{ const kc=n<=8?' k1':n<=12?' k2':''; return chip('gcs',n,n,num(S.vit.gcs)===n).replace('class="opt chip','class="opt chip'+kc+' ').replace('chip'+kc+'  ','chip'+kc+' '); }).join('')+'</div>';
+  if(num(S.vit.gcs)!==null && num(S.vit.gcs)<=12 && num(S.vit.gcs)>8) h+='<div style="margin-top:10px" class="grid">'+opt('gcsb','x','GCS ต่ำเป็นค่าเดิมของผู้ป่วย (ไม่ใช่อาการใหม่)',!!S.vit.gcsBaseline,'sq')+'</div>';
+  h+='</div><div class="vsec"><div class="vhead"><span class="vl">น้ำตาลปลายนิ้ว <small>DTX</small></span></div><div class="grid chips">'+[['none','ไม่ได้วัด',''],['low','<70 mg%',' k2'],['ok','70–350 mg%',''],['high','>350 mg%',' k2']].map(x=>chip('dtx',x[0],x[1],(S.vit.dtx||'none')===x[0]).replace('class="opt chip','class="opt chip'+x[2]+' ')).join('')+'</div></div>';
+  return h+'</section>';
+}
+
+function step4(R){
+  S.resSeen=true;
+  const n=R.resCount;
+  let h=`<section class="card"><h2>คาดว่าต้องใช้ทรัพยากรอะไรบ้าง</h2><p class="sub">นับเป็น "ชนิด" ไม่ใช่จำนวนครั้ง เช่น CBC กับ ปัสสาวะ นับเป็น lab 1 อย่าง</p>
+  <div class="grid">${RES.map(r=>opt('res',r[0],esc(r[1])+(r[2]?'<br><small>'+esc(r[2])+'</small>':''),S.res.includes(r[0]),'sq')).join('')}</div>
+  <p class="foot">${esc(NOT_RES)}</p>
+  <h3 class="sec">บาดเจ็บ</h3><div class="grid">${opt('trauma','x','บาดเจ็บ (trauma) ภายใน 24 ชั่วโมง จัดเป็น ESI 3 อย่างน้อย (เกณฑ์ รพ.)'+(S.cat==='trauma'?' · เลือกอัตโนมัติจากอาการสำคัญ':''),traumaEff(S),'sq')}</div>
+  <div class="note info" role="status">ทรัพยากรที่คาดไว้: <b>${n} อย่าง</b> ${R.stage==='RES'?'· ระดับเบื้องต้น <b>ESI '+R.level+'</b>':'· ผู้ป่วยเข้าเกณฑ์ ESI '+R.level+' แล้ว จึงไม่ต้องใช้จำนวนทรัพยากรตัดสิน'}</div></section>`;
+  return h;
+}
+
+function resultHTML(R){
+  const f=finalLevel(R);
+  const dest=f<=3?'ER':'OPD';
+  const reasons=R.stage==='L1'?R.l1:R.stage==='L2'?R.l2:[];
+  let h=`<section class="hero l${f}" aria-live="polite"><div class="lv">ESI ${f}</div><div class="tt">${LEVELS[f].title}</div><span class="dest">ส่งต่อ: ${dest==='ER'?'ห้องฉุกเฉิน (ER)':'ผู้ป่วยนอก (OPD)'}</span>${S.override?'<div>ยกระดับโดยผู้คัดกรอง จากระบบ ESI '+R.level+(S.override.reason?' · '+esc(S.override.reason):'')+'</div>':''}</section>`;
+  h+='<section class="card"><h2>เหตุผลที่ได้ระดับนี้</h2><ul class="clean">';
+  if(reasons.length) h+=reasons.map(x=>'<li>'+esc(x)+'</li>').join('');
+  else h+='<li>ไม่พบเกณฑ์ ESI 1–2 คาดว่าใช้ทรัพยากร '+R.resCount+' อย่าง'+(traumaEff(S)?' และเป็นผู้บาดเจ็บภายใน 24 ชม.':'')+'</li>';
+  h+='</ul>';
+  R.notes.forEach(n=>h+='<div class="note info">'+esc(n)+'</div>');
+  h+='</section>';
+  const adv=R.adv.filter(a=>!a.raiseTo||a.raiseTo<f);
+  if(adv.length){
+    h+='<section class="card"><h2>ข้อควรพิจารณา</h2>'+adv.map(a=>`<div class="note"><div class="row"><span>${esc(a.text)}</span>${a.raiseTo?`<button class="mini" data-a="raise" data-id="${a.raiseTo}">ยกเป็น ESI ${a.raiseTo}</button>`:''}</div></div>`).join('')+'</section>';
+  }
+  h+='<section class="card"><h2>คำแนะนำการดำเนินการ</h2><ul class="clean chk">'+recommend(f,S,R).map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul><p class="foot">เป็นข้อเสนอแนะทั่วไปตามแนวทางสากล โปรดปฏิบัติตามโปรโตคอลของโรงพยาบาลและดุลยพินิจของแพทย์/พยาบาล</p></section>';
+  h+='<section class="card"><h2>ปรับระดับ (ยกระดับได้เท่านั้น)</h2><p class="sub">ESI ไม่อนุญาตให้ลดระดับตามความแออัดของ ER หากผู้ป่วยอาการแย่ลงให้ยกระดับและบันทึกเหตุผล</p><div class="ovr">'+[1,2,3,4,5].map(n=>`<button class="lvbtn${f===n?' on':''}" data-a="ovr" data-id="${n}"${n>=R.level&&!(S.override&&n===R.level)?' disabled':''}>ESI ${n}</button>`).join('')+'</div>';
+  if(S.override){
+    h+='<h3 class="sec">เหตุผล</h3><div class="grid chips">'+['ดุลยพินิจทางคลินิก','อาการเปลี่ยนแปลง','ได้ข้อมูลเพิ่มเติม','ตามข้อควรพิจารณา'].map(x=>chip('ovrr',x,x,S.override.reason===x)).join('')+'</div><div style="margin-top:10px"><button class="btn" data-a="ovrclear">ใช้ระดับตามระบบ (ESI '+R.level+')</button></div>';
+  }
+  h+='</section>';
+  if(saveMsg) h+=`<p class="status ${saveMsg.ok?'ok':'err'}" role="status">${esc(saveMsg.t)}</p>`;
+  if(!dbh) h+='<p class="foot">ยังไม่ได้เชื่อมต่อฐานข้อมูล จึงบันทึกเคสไม่ได้ในหน้านี้ ผลคัดกรองยังใช้งานได้ตามปกติ</p>';
+  else if(canWrite===false) h+='<p class="foot">บัญชีนี้ดูข้อมูลได้อย่างเดียว บันทึกเคสไม่ได้ ขอสิทธิ์ผู้ร่วมใช้งาน (Contributor) จากเจ้าของหน้านี้</p>';
+  h+='<div style="margin:6px 0 14px"><button class="btn" data-a="newcase">เริ่มเคสใหม่โดยไม่บันทึก</button></div>';
+  h+=refHTML();
+  return h;
+}
+
+/* ---------------- data ---------------- */
+function buildRecord(){
+  const R=computeTriage(S); const f=finalLevel(R); const v=S.vit; const b=bandInfo(S);
+  const nv=k=>num(v[k]);
+  return {
+    v:APP_VERSION, ts:new Date().toISOString(), tsMs:Date.now(),
+    group:b.g, ageBand:S.ageBand, ageYears:b.g==='child'?childAge(S):null,
+    ctx:Object.keys(S.ctx).filter(k=>S.ctx[k]),
+    l1:S.l1.slice(), cat:S.cat, cc:S.cc, flags:S.flags.slice(), gen:S.gen.slice(),
+    pain:S.pain, painType:S.painType,
+    vit:{hr:S.vitL.hr||null,rr:S.vitL.rr||null,spo2:S.vitL.spo2||null,sbp:S.vitL.sbp||null,dbp:S.vitL.dbp||null,temp:S.vitL.temp||null,gcs:nv('gcs'),dtx:v.dtx||'none'},
+    res:S.res.slice(), resCount:R.resCount, trauma24:traumaEff(S),
+    stage:R.stage, computedLevel:R.level, finalLevel:f, overridden:!!S.override, overrideReason:S.override?S.override.reason||'':'',
+    dest:f<=3?'ER':'OPD', reasons:(R.stage==='L1'?R.l1:R.stage==='L2'?R.l2:[]).slice(0,6),
+    durationSec:Math.round((Date.now()-S.startedAt)/1000)
+  };
+}
+async function saveCase(){
+  if(!dbh||canWrite===false){ saveMsg={ok:false,t:'บันทึกไม่ได้ในบัญชีนี้'}; render(); return; }
+  try{
+    await dbh.collection('cases').add(buildRecord());
+    S=newState(); step=0; showResult=false; saveMsg={ok:true,t:'บันทึกเคสแล้ว เริ่มเคสใหม่ได้เลย'};
+    render(); window.scrollTo(0,0);
+  }catch(e){
+    saveMsg={ok:false,t:'บันทึกไม่สำเร็จ ('+(e&&e.code?e.code:'error')+') ลองอีกครั้ง'}; render();
+  }
+}
+function inRange(c){
+  if(range==='all') return true;
+  const days=range==='1'?1:7; return c.tsMs >= Date.now()-days*86400000;
+}
+function csvCell(x){ const s=x===null||x===undefined?'':String(x); return '"'+s.replace(/"/g,'""')+'"'; }
+async function exportCsv(){
+  const rows=cases.filter(inRange);
+  const head=['time','group','age_band','age_years','category','chief_complaint','esi1_items','red_flags','general_flags','pain','pain_type','hr','rr','spo2','sbp','dbp','temp','gcs','dtx','resources','resource_count','trauma_24h','computed_level','final_level','overridden','override_reason','destination','duration_sec'];
+  const lines=[head.join(',')];
+  rows.forEach(c=>{ const v=c.vit||{};
+    lines.push([c.ts,c.group,c.ageBand,c.ageYears,c.cat,c.cc,(c.l1||[]).join('|'),(c.flags||[]).join('|'),(c.gen||[]).join('|'),c.pain,c.painType,v.hr,v.rr,v.spo2,v.sbp,v.dbp,v.temp,v.gcs,v.dtx,(c.res||[]).join('|'),c.resCount,c.trauma24,c.computedLevel,c.finalLevel,c.overridden,c.overrideReason,c.dest,c.durationSec].map(csvCell).join(','));
+  });
+  try{
+    const dl=await window.claude.use('downloads'); if(!dl) throw new Error('none');
+    await dl.save({filename:'triage-suth-'+new Date().toISOString().slice(0,10)+'.csv', data:'﻿'+lines.join('\n')});
+  }catch(e){ if(!(e&&e.code==='declined')){ const m=$('#expmsg'); if(m) m.textContent='ส่งออกไม่ได้ในมุมมองนี้'; } }
+}
+
+function statsHTML(){
+  const rows=cases.filter(inRange); const n=rows.length;
+  let h='<section class="card"><h2>สถิติการคัดกรอง</h2><p class="sub">ข้อมูลไม่ระบุตัวตนของเคสที่บันทึกไว้</p><div class="grid chips" style="max-width:520px">'+[['1','วันนี้ (24 ชม.)'],['7','7 วัน'],['all','ทั้งหมด']].map(x=>chip('range',x[0],x[1],range===x[0])).join('')+'</div>';
+  if(dbState==='connecting') h+='<p class="foot">กำลังโหลดข้อมูล…</p>';
+  if(dbState==='slow') h+='<div class="note">ยังเชื่อมต่อฐานข้อมูลไม่ได้ ข้อมูลที่เห็นอาจไม่เป็นปัจจุบัน</div>';
+  if(dbState==='none') h+='<div class="note">มุมมองนี้ไม่มีฐานข้อมูล จึงดูสถิติไม่ได้</div>';
+  if(!n){ h+='<div class="empty" style="margin-top:14px">ยังไม่มีเคสในช่วงเวลานี้ เมื่อกด "บันทึกและเคสใหม่" ที่หน้าผลคัดกรอง ข้อมูลจะมาแสดงที่นี่</div></section>'; return h; }
+  const cnt=(fn)=>{ const m={}; rows.forEach(c=>{ const k=fn(c); if(k!=null&&k!=='') m[k]=(m[k]||0)+1; }); return m; };
+  const lv=cnt(c=>c.finalLevel); const gp=cnt(c=>c.group); const ov=rows.filter(c=>c.overridden).length;
+  const dur=rows.map(c=>c.durationSec).filter(x=>typeof x==='number'&&x>=0&&x<3600); const avg=dur.length?Math.round(dur.reduce((a,b)=>a+b,0)/dur.length):null;
+  h+='<div class="kpis" style="margin-top:14px">'
+   +`<div class="kpi"><b>${n}</b><span>เคสทั้งหมด</span></div>`
+   +`<div class="kpi"><b>${(lv[1]||0)+(lv[2]||0)}</b><span>ESI 1–2 (${Math.round(((lv[1]||0)+(lv[2]||0))/n*100)}%)</span></div>`
+   +`<div class="kpi"><b>${gp.adult||0} / ${gp.child||0}</b><span>ผู้ใหญ่ / เด็ก</span></div>`
+   +`<div class="kpi"><b>${avg===null?'–':avg+' วิ'}</b><span>เวลาคัดกรองเฉลี่ย</span></div>`
+   +`<div class="kpi"><b>${ov}</b><span>เคสที่ยกระดับ</span></div></div>`;
+  h+='<h3 class="sec">จำนวนตามระดับ ESI</h3>'+[1,2,3,4,5].map(k=>{ const c=lv[k]||0; return `<div class="hb"><span class="nm"><span class="lvtag l${k}">ESI ${k}</span></span><div class="tr"><div class="fl l${k}" style="width:${c/n*100}%"></div></div><span class="vl">${c} (${Math.round(c/n*100)}%)</span></div>`; }).join('');
+  const cats=cnt(c=>c.cat); const catRows=Object.keys(cats).sort((a,b)=>cats[b]-cats[a]);
+  h+='<h3 class="sec">หมวดอาการสำคัญ</h3>'+catRows.map(k=>{ const c=cats[k]; const ct=catById(k); return `<div class="hb"><span class="nm">${esc(ct?ct.t:k)}</span><div class="tr"><div class="fl br" style="width:${c/cats[catRows[0]]*100}%"></div></div><span class="vl">${c}</span></div>`; }).join('');
+  const ccs=cnt(c=>c.cc); const ccRows=Object.keys(ccs).sort((a,b)=>ccs[b]-ccs[a]).slice(0,8);
+  h+='<h3 class="sec">อาการที่พบบ่อย</h3>'+ccRows.map(k=>`<div class="hb"><span class="nm">${esc(k)}</span><div class="tr"><div class="fl br" style="width:${ccs[k]/ccs[ccRows[0]]*100}%"></div></div><span class="vl">${ccs[k]}</span></div>`).join('');
+  h+='<h3 class="sec">เคสล่าสุด</h3><div class="tbl"><table><thead><tr><th>เวลา</th><th>กลุ่ม</th><th>อาการ</th><th>ESI</th><th>ส่งต่อ</th></tr></thead><tbody>'
+   +rows.slice(0,12).map(c=>{ const d=new Date(c.tsMs); const t=d.toLocaleString('th-TH',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}); const b=AGE_BANDS[c.ageBand];
+     return `<tr><td>${esc(t)}</td><td>${esc(b?b.t:c.group)}</td><td>${esc(c.cc||'')}</td><td><span class="lvtag l${c.finalLevel}">${c.finalLevel}</span></td><td>${esc(c.dest||'')}</td></tr>`; }).join('')
+   +'</tbody></table></div>';
+  h+='<div style="margin-top:14px" id="exprow"><button class="btn" data-a="export">ส่งออก CSV</button> <span class="foot" id="expmsg"></span></div></section>';
+  return h;
+}
+
+/* reference table, shown on the result page footer */
+function refHTML(){
+  return `<details class="card ref"><summary>เกณฑ์ที่ใช้ในแอปนี้ (สำหรับตรวจสอบ)</summary>
+  <p class="foot">โครงสร้างตัดสินและการนับทรัพยากรตาม ESI Handbook v5 (ENA 2023) ส่วนค่าตัดสัญญาณชีพและรายการอาการ ESI 1–2 ตามแผนผังคัดแยกของโรงพยาบาลมหาวิทยาลัยเทคโนโลยีสุรนารี (อ้างอิง MOPH Triage)</p>
+  <div class="tbl"><table><thead><tr><th>ระดับ</th><th>ผู้ใหญ่</th><th>เด็ก (ตามช่วงอายุ)</th></tr></thead><tbody>
+  <tr><td>ESI 1</td><td>SpO₂ <90% · หายใจ >30 หรือ <10 · SBP <90 หรือ MAP <65 · GCS ≤8</td><td>SpO₂ <90% · SBP <70+2×อายุ · GCS ≤8</td></tr>
+  <tr><td>ESI 2</td><td>หายใจ >28 · ชีพจร >130 · ความดัน ≥180/110 · SpO₂ <92% · GCS ≤12 (ใหม่) · DTX <70 หรือ >350</td><td>&lt;3 เดือน: HR >180, RR >50 · 3 เดือน–3 ปี: >160, >40 · 3–8 ปี: >140, >30 · ≥8 ปี: >120, >26 · SpO₂ <92% · GCS ≤12 · DTX ผิดปกติ</td></tr>
+  <tr><td>ESI 3–5</td><td colspan="2">ทรัพยากร ≥2 อย่าง = ESI 3 · 1 อย่าง = ESI 4 · ไม่มี = ESI 5 · บาดเจ็บใน 24 ชม. = ESI 3 อย่างน้อย (เกณฑ์ รพ.)</td></tr>
+  </tbody></table></div></details>`;
+}
+
+/* ---------------- events ---------------- */
+function refreshLive(){
+  const R=computeTriage(S); const vs=vitalStatus(S);
+  VFIELDS.forEach(f=>{
+    const el=document.getElementById('vf-'+f[0]); if(!el) return;
+    const st=vs[f[0]]; el.className='vf'+(st?(st.lvl===1?' l1':st.lvl===2?' l2':' warn'):'');
+    const s=document.getElementById('vs-'+f[0]); if(s) s.textContent=st?st.text:'';
+  });
+  const p=document.getElementById('livepill'); if(p) p.innerHTML=pillHTML(R);
+  const nb=document.querySelector('[data-a="next"]'); if(nb&&step===2) nb.disabled=!(R.stage==='L1'||(S.cat&&S.cc));
+}
+document.addEventListener('input',e=>{ const t=e.target; if(t&&t.dataset&&t.dataset.v){ S.vit[t.dataset.v]=t.value; refreshLive(); }});
+
+function clampStep(){ if(!S.ageBand) step=0; }
+document.addEventListener('click',e=>{
+  const el=e.target.closest('[data-a]'); if(!el||el.disabled) return;
+  const a=el.dataset.a, id=el.dataset.id;
+  switch(a){
+    case 'tab': view=id; render(); if(view==='stats') window.scrollTo(0,0); return;
+    case 'range': range=id; render(); return;
+    case 'export': exportCsv(); return;
+    case 'group': if(S.group!==id){ S.vit={}; S.vitL={}; S.group=id; S.ageBand=null; S.ageYears=null; S.ctx={}; S.l1=S.l1.filter(x=>{const it=L1.find(y=>y[0]===x); return !(it&&it[2]==='child'&&id!=='child');}); S.flags=[]; S.cc=null; S.cat=null; } break;
+    case 'band': S.vit={}; S.vitL={}; S.ageBand=id; { const b=AGE_BANDS[id]; S.ageYears=b.g==='child'?b.yrs[0]:null; } break;
+    case 'year': S.ageYears=parseInt(id,10); delete S.vit.sbp; delete S.vitL.sbp; break;
+    case 'ctx': S.ctx[id]=!S.ctx[id]; break;
+    case 'l1': tog(S.l1,id); break;
+    case 'cat': if(S.cat!==id){ S.cat=id; S.cc=null; S.flags=[]; } break;
+    case 'cc': { const c=catById(S.cat); S.cc=c.cc[parseInt(id,10)]; } break;
+    case 'flag': tog(S.flags,id); break;
+    case 'gen': tog(S.gen,id); break;
+    case 'pain': { const n=parseInt(id,10); S.pain=(S.pain===n)?null:n; if(S.pain===null||S.pain<7) S.painType=null; } break;
+    case 'ptype': S.painType=(S.painType===id)?null:id; break;
+    case 'vit': { const [k,i]=id.split(':'); const x=vBins(k)[parseInt(i,10)]; if(x){ if(S.vit[k]===x.v){ delete S.vit[k]; delete S.vitL[k]; } else { S.vit[k]=x.v; S.vitL[k]=x.l; } } } break;
+    case 'gcs': S.vit.gcs=(num(S.vit.gcs)===parseInt(id,10))?'':String(id); S.vit.gcsBaseline=false; break;
+    case 'gcsb': S.vit.gcsBaseline=!S.vit.gcsBaseline; break;
+    case 'dtx': S.vit.dtx=id; break;
+    case 'res': tog(S.res,id); if(id==='proc1'&&S.res.includes('proc2')&&S.res.includes('proc1')) S.res=S.res.filter(x=>x!=='proc2'); if(id==='proc2'&&S.res.includes('proc2')) S.res=S.res.filter(x=>x!=='proc1'); break;
+    case 'trauma': if(S.cat!=='trauma') S.trauma24=!S.trauma24; break;
+    case 'next': if(step<4) step++; else { showResult=true; saveMsg=null; } window.scrollTo(0,0); break;
+    case 'prev': if(step>0) step--; window.scrollTo(0,0); break;
+    case 'goto': if(S.ageBand){ step=parseInt(id,10); } window.scrollTo(0,0); break;
+    case 'result': showResult=true; saveMsg=null; window.scrollTo(0,0); break;
+    case 'back': showResult=false; window.scrollTo(0,0); break;
+    case 'newcase': S=newState(); step=0; showResult=false; saveMsg=null; window.scrollTo(0,0); break;
+    case 'raise': S.override={level:parseInt(id,10), reason:'ตามข้อควรพิจารณา'}; break;
+    case 'ovr': { const n=parseInt(id,10); const R=computeTriage(S); if(n===R.level) S.override=null; else if(n<R.level) S.override={level:n, reason:(S.override&&S.override.reason)||''}; } break;
+    case 'ovrr': if(S.override) S.override.reason=(S.override.reason===id)?'':id; break;
+    case 'ovrclear': S.override=null; break;
+    case 'save': saveCase(); return;
+  }
+  clampStep(); render();
+});
+
+/* ---------------- boot ---------------- */
+function bindView(){ const h=(location.hash||'').replace('#',''); view = h==='stats'?'stats':'triage'; }
+window.addEventListener('hashchange',()=>{ bindView(); render(); });
+bindView(); render();
+
+(async function connect(){
+  try{
+    if(!(window.claude&&window.claude.use)){ dbState='none'; render(); return; }
+    const db=await window.claude.use('db');
+    if(!db){ dbState='none'; render(); return; }
+    dbh=db;
+    try{ const user=await window.claude.use('user'); if(user&&user.can){ const w=user.can('data.write'); canWrite=(w===null||w===undefined)?null:!!w; } }catch(_){}
+    const timer=setTimeout(()=>{ if(dbState==='connecting'){ dbState='slow'; if(view==='stats') render(); } },10000);
+    db.collection('cases').orderBy('tsMs','desc').limit(1000).onSnapshot(snap=>{
+      clearTimeout(timer);
+      cases=snap.docs.map(d=>d.data()).filter(Boolean);
+      if(!snap.metadata.fromCache||dbState==='connecting') dbState='ready';
+      if(view==='stats') render(); else if(showResult) renderBar(computeTriage(S));
+    },err=>{ clearTimeout(timer); dbState='slow'; if(view==='stats') render(); });
+    if(showResult) render();
+  }catch(_){ dbState='none'; render(); }
+})();
+</script>
+
+</body></html>

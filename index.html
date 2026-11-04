@@ -789,5 +789,52 @@ bindView(); render();
   }catch(_){ dbState='none'; render(); }
 })();
 </script>
+  <!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>Triage SUTH</title>
+    <!-- CSS หรือ สไตล์ต่างๆ อยู่ตรงนี้ -->
+</head>
+<body>
+
+    <!-- 1. ส่วนหน้าตาเว็บ (HTML Form ต่างๆ) ของคุณจะอยู่ตรงนี้ -->
+    <div class="form-container">
+        <!-- ฟอร์มรับข้อมูล -->
+    </div>
+
+    <!-- 2. วางโค้ด JavaScript (Java) ไว้ตรงนี้ ก่อนปิด body -->
+    <script>
+        // ⚠️ นำ URL จาก Google Apps Script มาวางตรงนี้
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxEMm_NgC36i169Fmk3gSKAeKKgBatKX7SyC2RvD5RZ_f6x5dYeVk2iqp9w03r_e6nJ/exec";
+
+        document.getElementById("triageForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                hn: document.getElementById("hn").value,
+                triageLevel: document.getElementById("triageLevel").value,
+                details: document.getElementById("details").value
+            };
+
+            fetch(WEB_APP_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData)
+            })
+            .then(() => {
+                alert("บันทึกข้อมูลสำเร็จ!");
+                document.getElementById("triageForm").reset();
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("เกิดข้อผิดพลาด");
+            });
+        });
+    </script>
+
+</body>
+</html>
 
 </body></html>
